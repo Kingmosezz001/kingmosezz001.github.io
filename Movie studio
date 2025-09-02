@@ -1,0 +1,2827 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Studio Tycoon</title>
+  <style>
+    /* Existing CSS unchanged, except for #moviePanel and .action-buttons */
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #registration, #game, #loading, #movieCreation, #youtubeChannel, #hireTalent, #promotionCampaign {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+      width: 360px;
+      text-align: center;
+    }
+    input, select, button {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      background: #ff9800;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #e67e22;
+    }
+    #game, #loading, #movieCreation, #youtubeChannel, #hireTalent, #promotionCampaign {
+      display: none;
+    }
+    .progress-container {
+      width: 100%;
+      background: #333;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .progress-bar {
+      height: 20px;
+      width: 0;
+      background: #ff9800;
+      transition: width 0.2s;
+    }
+    #loadingText {
+      margin-top: 10px;
+      font-style: italic;
+      color: #ccc;
+      font-size: 14px;
+    }
+    #statsBar {
+  background: #2a2a2a;
+  padding: 15px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 90%;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  border-bottom: 1px solid #444;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.stat-box {
+  background: #333;
+  border-radius: 8px;
+  padding: 10px;
+  flex: 1;
+  max-width: 160px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.stat-icon {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #ccc;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #FFD700;
+}
+    #game {
+      margin-top: 80px;
+    }
+    .movie {
+      background: #333;
+      margin: 10px 0;
+      padding: 45px;
+      border-radius: 8px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .control-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 50px; /* Increased from 20px to 50px for more space below action buttons */
+}
+    .control-buttons button {
+      width: 48%;
+      padding: 8px;
+      font-size: 14px;
+    }
+    .action-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Changed from repeat(3, 1fr) */
+  gap: 10px;
+  margin-top: 50px;
+  position: relative;
+}
+.action-buttons button:nth-child(7) {
+    background: #F44336;
+}
+.action-buttons button:nth-child(7):hover {
+    opacity: 0.9;
+}
+    .action-buttons button {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .youtube-video {
+      background: #333;
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .youtube-video button {
+      width: 100%;
+      margin-top: 5px;
+    }
+    #movieCreation .genres {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    #movieCreation .genres label {
+      width: 30%;
+      margin-bottom: 5px;
+    }
+    #movieCreation .episode-input {
+      margin-top: 5px;
+    }
+    #hireTalent .talent-list {
+      text-align: left;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    #hireTalent .talent {
+      margin: 10px 0;
+      padding: 5px;
+      background: #333;
+      border-radius: 5px;
+    }
+    #hireTalent .category-select {
+      margin-bottom: 15px;
+    }
+    .action-buttons button:nth-child(1) { background: #4CAF50; }
+    .action-buttons button:nth-child(2) { background: #2196F3; }
+    .action-buttons button:nth-child(3) { background: #FF5722; }
+    .action-buttons button:nth-child(4) { background: #9C27B0; }
+    .action-buttons button:nth-child(5) { background: #FFEB3B; }
+    .action-buttons button:nth-child(6) { background: #607D8B; }
+    .action-buttons button:hover {
+      opacity: 0.9;
+    }
+    #movieCreation .talent-select {
+      margin-top: 8px;
+    }
+    #movieCreation .talent-select select {
+      margin-bottom: 5px;
+    }
+    #moviePanel {
+  background: #1e1e1e;
+  padding: 13px;
+  border-radius: 11px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+  width: 350px; /* Reduced width for mobile-friendliness */
+  text-align: center;
+  position: fixed; /* Changed to fixed for centering */
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center on screen */
+  z-index: 1001;
+  color: #FFD700;
+  max-height: 70vh; /* Slightly reduced for smaller modal */
+  overflow-y: auto;
+  font-size: 10px;
+}
+    #movieList {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .movie p {
+      margin: 3px 0;
+      font-size: 12px;
+    }
+    .movie ul {
+      margin: 3px 0 8px;
+      padding-left: 15px;
+      list-style-type: disc;
+      font-size: 9px;
+    }
+    .movie select, .movie button {
+      margin-top: 3px;
+      padding: 6px;
+      width: 100%;
+      border-radius: 8px;
+      border: none;
+      font-size: 10px;
+    }
+    .movie button {
+      background: #ff9800;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .movie button:hover {
+      background: #e67e22;
+    }
+    #youtubePanel {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 11px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+      width: 340px;
+      text-align: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1001;
+      color: #FFD700;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    #youtubeVideoList {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .youtube-video p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    .youtube-video .video-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #promotionCampaign select {
+      margin-bottom: 10px;
+    }
+    #promotionCampaign p {
+      font-size: 14px;
+      margin: 5px 0;
+      color: #FFD700;
+    }
+    #streamingPlatform {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+      width: 360px;
+      text-align: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1001;
+      color: #FFD700;
+      max-height: 70vh;
+      overflow-y: auto;
+      display: none;
+    }
+    #streamingPlatform select {
+      margin-bottom: 10px;
+    }
+    #streamingPlatform p {
+      font-size: 14px;
+      margin: 5px 0;
+      color: #FFD700;
+    }
+    #streamingMoviesPanel {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 11px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+    width: 340px;
+    text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    color: #FFD700;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+#streamingMoviesList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.streaming-movie {
+    background: #333;
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.streaming-movie p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+#streamingMoviesPanel button {
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    border-radius: 8px;
+    border: none;
+    background: #ff9800;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+#streamingMoviesPanel button:hover {
+    background: #e67e22;
+}
+#movieReviews {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+  width: 360px;
+  text-align: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  color: #FFD700;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.movie-review {
+  background: #333;
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.movie-review p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+.movie-review ul {
+  margin: 5px 0;
+  padding-left: 20px;
+  font-size: 12px;
+}
+.youtube-video .poster {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+#movieCreation .duration-input {
+  margin-top: 5px;
+}
+#movieCreation .duration-input input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+}
+  </style>
+</head>
+<body>
+	<div id="movieReviews" style="display: none;">
+  <h2>🎬 Movie Reviews</h2>
+  <div id="reviewList"></div>
+  <button onclick="closeReviews()">Close</button>
+</div>
+	<div id="streamingMoviesPanel" style="display: none;">
+    <h2> Streaming Movies</h2>
+    <div id="streamingMoviesList"></div>
+    <button onclick="closeStreamingMovies()">Close</button>
+</div>
+	<div id="streamingPlatform">
+    <h2> Launch Streaming Release</h2>
+    <select id="platformSelect">
+      <option value="">Select Platform</option>
+    </select>
+    <select id="movieSelect">
+      <option value="">Select Movie</option>
+    </select>
+    <p id="platformDetails">Select a platform to see details.</p>
+    <button onclick="launchStreamingRelease()">Launch Release</button>
+    <button onclick="closeStreamingPlatform()">Cancel</button>
+  </div>
+  <div id="registration">
+    <h2>🎬 Movie Studio Tycoon</h2>
+    <p>Create your studio to start your journey!</p>
+    <input type="text" id="playerName" placeholder="Studio Name" required>
+    <select id="startMoney">
+  <option value="10000">$10,000</option>
+  <option value="15000">$15,000</option>
+  <option value="20000">$20,000</option>
+  <option value="25000">$25,000</option>
+  <option value="30000">$30,000</option>
+  <option value="35000">$35,000</option>
+  <option value="40000">$40,000</option>
+  <option value="45000">$45,000</option>
+  <option value="50000">$50,000</option>
+</select>
+    <select id="startYear">
+      <option value="2025">2025</option>
+      <option value="2026">2026</option>
+      <option value="2027">2027</option>
+      <option value="2028">2028</option>
+      <option value="2029">2029</option>
+      <option value="2030">2030</option>
+    </select>
+    <button onclick="registerPlayer()">Start Studio</button>
+  </div>
+
+  <div id="loading">
+    <h2>Loading your studio...</h2>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p id="loadingText">🎬 Setting up your first movie set...</p>
+  </div>
+
+  <div id="game">
+    <div id="statsBar">
+    <div class="stats-row">
+        <div class="stat-box">
+            <span class="stat-icon">📅</span>
+            <span class="stat-label">Year</span>
+            <span id="year" class="stat-value"></span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-icon">🗓️</span>
+            <span class="stat-label">Week</span>
+            <span id="week" class="stat-value"></span>
+        </div>
+    </div>
+    <div class="stats-row">
+        <div class="stat-box">
+            <span class="stat-icon">👥</span>
+            <span class="stat-label">Fans</span>
+            <span id="fans" class="stat-value">0</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-icon">🌟</span>
+            <span class="stat-label">Fame</span>
+            <span id="fame" class="stat-value">0</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-icon">💰</span>
+            <span class="stat-label">Money</span>
+            <span id="money" class="stat-value">$100</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-icon">🏆</span>
+            <span class="stat-label">Awards</span>
+            <span id="awards" class="stat-value">0</span>
+        </div>
+    </div>
+</div>
+
+    <div class="action-buttons">
+  <button onclick="openMovieCreation()">🎥 Produce a New Movie</button>
+  <button onclick="launchStreamingPlatform()">📺 Launch Streaming Platform</button>
+  <button onclick="manageYouTubeChannel()">📹 Manage YouTube Channel</button>
+  <button onclick="startPromotionCampaign()">📢 Start Promotion Campaign</button>
+  <button onclick="hireTalent()">🎭 Hire Talent</button>
+  <button onclick="showMovies()">📽️ Movies</button>
+  <button onclick="showStreamingMovies()">📺 Streaming Movies</button>
+  <button onclick="showReviews()">📰 Movie Reviews</button>
+</div>
+
+    <div class="control-buttons">
+      <button onclick="saveGame()">🎬 Save</button>
+      <button onclick="resetGame()">🔄 Reset</button>
+      <button onclick="nextWeek()">⏭️ Next Week</button>
+    </div>
+  </div>
+
+  <div id="movieCreation">
+  <h2> Produce a New Movie</h2>
+  <select id="sequelOrSeasonSelect">
+    <option value="">New Movie</option>
+    <!-- Options for sequels and seasons will be populated dynamically -->
+  </select>
+  <input type="text" id="movieTitle" placeholder="Movie Title" required>
+  <select id="movieType">
+    <option value="feature">Feature Film</option>
+    <option value="season">Season Film</option>
+    <option value="short">Short Film</option>
+    <option value="mini-series">Mini-Series</option>
+  </select>
+  <div class="episode-input" id="episodeInput" style="display: none;">
+    <input type="number" id="episodeCount" placeholder="Number of Episodes (1-10)" min="1" max="10" value="1">
+  </div>
+  <div class="duration-input" id="durationInput">
+  <input type="number" id="movieDuration" placeholder="Duration (minutes)" min="10" max="180" value="90">
+</div>
+  <select id="genres" multiple>
+    <option value="action">Action</option>
+    <option value="romance">Romance</option>
+    <option value="comedy">Comedy</option>
+    <option value="drama">Drama</option>
+    <option value="horror">Horror</option>
+    <option value="thriller">Thriller</option>
+    <option value="animation">Animation</option>
+    <option value="documentary">Documentary</option>
+    <option value="sci-fi">Sci-Fi</option>
+    <option value="fantasy">Fantasy</option>
+    <option value="adventure">Adventure</option>
+    <option value="musical">Musical</option>
+    <option value="western">Western</option>
+    <option value="historical">Historical</option>
+  </select>
+  <select id="budget">
+    <option value="1000">Low Budget ($1,000)</option>
+    <option value="2500">Medium-Low Budget ($2,500)</option>
+    <option value="5000">Medium Budget ($5,000)</option>
+    <option value="7500">Medium-High Budget ($7,500)</option>
+    <option value="10000">High Budget ($10,000)</option>
+  </select>
+  <div class="talent-select">
+    <h3>Select Talents</h3>
+    <select id="directorSelect" multiple>
+      <option value="">Select Director(s)</option>
+    </select>
+    <select id="actorSelect" multiple>
+      <option value="">Select Actor(s)</option>
+    </select>
+    <select id="composerSelect" multiple>
+      <option value="">Select Composer(s)</option>
+    </select>
+    <select id="cinematographerSelect" multiple>
+      <option value="">Select Cinematographer(s)</option>
+    </select>
+    <select id="otherSelect" multiple>
+      <option value="">Select Other Talent(s)</option>
+    </select>
+  </div>
+  <button onclick="createMovie()">Start Production</button>
+  <button onclick="closeMovieCreation()">Cancel</button>
+</div>
+
+  <div id="youtubeChannel">
+    <h2>📹 Your YouTube Channel</h2>
+    <h3>Posted Movies</h3>
+    <div id="youtubeVideos"></div>
+    <button onclick="returnToGame()">⬅️ Back to Studio</button>
+  </div>
+
+  <div id="hireTalent">
+    <h2>🎭 Hire Talent</h2>
+    <div class="category-select">
+      <select id="talentCategory" onchange="renderTalentsByCategory()">
+        <option value="directors">Directors</option>
+        <option value="actors">Actors</option>
+        <option value="composers">Composers</option>
+        <option value="cinematographers">Cinematographers</option>
+        <option value="others">Others</option>
+      </select>
+    </div>
+    <div class="talent-list" id="talentList"></div>
+    <button onclick="closeHireTalent()">Back to Studio</button>
+  </div>
+
+  <div id="promotionCampaign">
+    <h2>📢 Start Promotion Campaign</h2>
+    <select id="campaignType">
+  <option value="">Select Campaign Type</option>
+  <option value="socialMedia">Social Media ($5K, +0.025/100 Fame, +25K Fans)</option>
+  <option value="tvAd">TV Ad ($15K, +0.075/100 Fame, +75K Fans)</option>
+  <option value="billboard">Billboard ($10K, +0.050/100 Fame, +50K Fans)</option>
+  <option value="influencer">Influencer ($7.5K, +0.038/100 Fame, +37.5K Fans)</option>
+  <option value="pressRelease">Press Release ($4K, +0.020/100 Fame, +20K Fans)</option>
+  <option value="viralVideo">Viral Video ($8K, +0.040/100 Fame, +40K Fans)</option>
+  <option value="celebrityEndorsement">Celebrity Endorsement ($20K, +0.100/100 Fame, +100K Fans)</option>
+  <option value="festivalScreening">Festival Screening ($12K, +0.060/100 Fame, +60K Fans)</option>
+  <option value="onlineStreamingEvent">Online Streaming Event ($9K, +0.045/100 Fame, +45K Fans)</option>
+  <option value="globalTour">Global Tour ($25K, +0.125/100 Fame, +125K Fans)</option>
+</select>
+    <select id="promotionTarget">
+      <option value="company">Promote Company</option>
+    </select>
+    <p id="campaignDetails">Select a campaign type to see details.</p>
+    <button onclick="launchPromotion()">Launch Campaign</button>
+    <button onclick="closePromotionCampaign()">Cancel</button>
+  </div>
+
+  <script>
+    let player = {
+    name: "",
+    fans: 0,
+    money: 1000,
+    level: 1,
+    year: 2025,
+    week: "January 1st",
+    fame: 0,
+    movies: [],
+    youtubeVideos: [],
+    talents: [],
+    subscribers: 0,
+    totalViews: 0,
+    youtubeEarnings: 0,
+    milestonesAchieved: [],
+    activeCampaigns: [],
+    streamingMovies: [], // Add this line
+    reviews: [],
+    awards: [],
+};
+
+    window.onload = function () {
+  const savedGame = localStorage.getItem("movieStudioTycoon");
+  if (savedGame) {
+    player = JSON.parse(savedGame);
+    if (!player.hasOwnProperty("subscribers")) player.subscribers = 0;
+    if (!player.hasOwnProperty("totalViews")) player.totalViews = 0;
+    if (!player.hasOwnProperty("youtubeEarnings")) player.youtubeEarnings = 0;
+    if (!player.hasOwnProperty("milestonesAchieved")) player.milestonesAchieved = [];
+    if (!player.hasOwnProperty("streamingMovies")) player.streamingMovies = [];
+    // Ensure existing movies have a duration property
+    player.movies.forEach(movie => {
+      if (!movie.hasOwnProperty("duration")) movie.duration = movie.type === "short" ? 30 : movie.type === "feature" ? 90 : 45;
+    });
+    player.streamingMovies.forEach(movie => {
+      if (!movie.hasOwnProperty("duration")) movie.duration = movie.type === "short" ? 30 : movie.type === "feature" ? 90 : 45;
+    });
+    document.getElementById("registration").style.display = "none";
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("game").style.display = "block";
+    document.getElementById("year").innerText = player.year;
+    document.getElementById("week").innerText = player.week;
+    document.getElementById("fans").innerText = formatNumber("fans", player.fans);
+    document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+    document.getElementById("money").innerText = formatNumber("money", player.money);
+    renderMovies();
+    renderYouTubeVideos();
+    gameLoop();
+  }
+  document.getElementById("movieType").addEventListener("change", function () {
+    const episodeInput = document.getElementById("episodeInput");
+    const durationInput = document.getElementById("durationInput");
+    if (this.value === "season" || this.value === "mini-series") {
+      episodeInput.style.display = "block";
+      durationInput.querySelector("input").placeholder = "Duration per Episode (20-60 minutes)";
+      durationInput.querySelector("input").min = 20;
+      durationInput.querySelector("input").max = 60;
+      durationInput.querySelector("input").value = 45;
+    } else if (this.value === "short") {
+      episodeInput.style.display = "none";
+      durationInput.querySelector("input").placeholder = "Duration (10-60 minutes)";
+      durationInput.querySelector("input").min = 10;
+      durationInput.querySelector("input").max = 60;
+      durationInput.querySelector("input").value = 30;
+    } else {
+      episodeInput.style.display = "none";
+      durationInput.querySelector("input").placeholder = "Duration (60-180 minutes)";
+      durationInput.querySelector("input").min = 60;
+      durationInput.querySelector("input").max = 180;
+      durationInput.querySelector("input").value = 90;
+    }
+  });
+  document.getElementById("campaignType")?.addEventListener("change", updateCampaignDetails);
+};
+
+    const messages = [
+      "🎬 Lights, Camera, Action!",
+      "📽️ Every blockbuster starts small...",
+      "🍿 The audience is waiting..."
+    ];
+
+    function registerPlayer() {
+      const name = document.getElementById("playerName").value;
+      const money = parseInt(document.getElementById("startMoney").value);
+      const year = document.getElementById("startYear").value;
+      if (name.trim() === "") {
+        alert("Please enter your studio name.");
+        return;
+      }
+      player.name = name;
+      player.money = money;
+      player.year = year;
+      player.week = "January 1st";
+      player.fame = 0;
+      player.subscribers = 0;
+      player.totalViews = 0;
+      player.youtubeEarnings = 0;
+      player.milestonesAchieved = [];
+      document.getElementById("registration").style.display = "none";
+      document.getElementById("loading").style.display = "block";
+
+      let progress = 0;
+      let bar = document.getElementById("progressBar");
+      let msgIndex = 0;
+      let textEl = document.getElementById("loadingText");
+
+      let msgInterval = setInterval(() => {
+        textEl.innerText = messages[msgIndex];
+        msgIndex = (msgIndex + 1) % messages.length;
+      }, 2000);
+
+      let interval = setInterval(() => {
+        progress += 100 / 30;
+        if (progress >= 100) {
+          clearInterval(interval);
+          clearInterval(msgInterval);
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("game").style.display = "block";
+          document.getElementById("year").innerText = player.year;
+          document.getElementById("week").innerText = player.week;
+          document.getElementById("money").innerText = player.money;
+          document.getElementById("fame").innerText = player.fame;
+          gameLoop();
+        }
+        bar.style.width = progress + "%";
+      }, 200);
+    }
+
+    function saveGame() {
+      localStorage.setItem("movieStudioTycoon", JSON.stringify(player));
+      alert("Game saved!");
+    }
+
+    function resetGame() {
+    if (confirm("Are you sure you want to reset? All progress will be lost.")) {
+        localStorage.removeItem("movieStudioTycoon");
+        player = {
+            name: "",
+            fans: 0,
+            money: 1000,
+            level: 1,
+            year: 2025,
+            week: "January 1st",
+            fame: 0,
+            movies: [],
+            youtubeVideos: [],
+            talents: [],
+            subscribers: 0,
+            totalViews: 0,
+            youtubeEarnings: 0,
+            milestonesAchieved: [],
+            activeCampaigns: [],
+            streamingMovies: [],
+        };
+        document.getElementById("game").style.display = "none";
+        const moviePanel = document.getElementById("moviePanel");
+        if (moviePanel) moviePanel.remove();
+        const streamingMoviesPanel = document.getElementById("streamingMoviesPanel");
+        if (streamingMoviesPanel) streamingMoviesPanel.remove();
+        document.getElementById("youtubeVideos").innerHTML = "";
+        document.getElementById("registration").style.display = "block";
+        document.getElementById("playerName").value = "";
+    }
+}
+
+    function openMovieCreation() {
+  document.getElementById("game").style.display = "none";
+  document.getElementById("movieCreation").style.display = "block";
+
+  // Populate sequel/season dropdown
+  const sequelOrSeasonSelect = document.getElementById("sequelOrSeasonSelect");
+  sequelOrSeasonSelect.innerHTML = '<option value="">New Movie</option>';
+  player.movies.forEach((movie, index) => {
+    const option = document.createElement("option");
+    option.value = index;
+    if (movie.type === "season") {
+      option.innerText = `Next Season: ${movie.title}`;
+    } else if (movie.type === "feature" || movie.type === "short") {
+      option.innerText = `Sequel: ${movie.title}`;
+    } else if (movie.type === "mini-series") {
+      option.innerText = `Next Season: ${movie.title}`;
+    }
+    sequelOrSeasonSelect.appendChild(option);
+  });
+  player.streamingMovies.forEach((movie, index) => {
+    const option = document.createElement("option");
+    option.value = `s_${index}`;
+    if (movie.type === "season" || movie.type === "mini-series") {
+      option.innerText = `Next Season: ${movie.title} (Streaming)`;
+    } else if (movie.type === "feature" || movie.type === "short") {
+      option.innerText = `Sequel: ${movie.title} (Streaming)`;
+    }
+    sequelOrSeasonSelect.appendChild(option);
+  });
+  player.youtubeVideos.forEach((video, index) => {
+    const option = document.createElement("option");
+    option.value = `y_${index}`;
+    if (video.isSeries) {
+      option.innerText = `Next Season: ${video.title} (YouTube)`;
+    } else {
+      option.innerText = `Sequel: ${video.title} (YouTube)`;
+    }
+    sequelOrSeasonSelect.appendChild(option);
+  });
+
+  // Reset movie creation form
+  document.getElementById("movieTitle").value = "";
+  document.getElementById("movieType").value = "feature";
+  document.getElementById("episodeInput").style.display = "none";
+  document.getElementById("episodeCount").value = "1";
+  document.getElementById("movieDuration").value = "90"; // Reset duration to default
+  const genreSelect = document.getElementById("genres");
+  Array.from(genreSelect.options).forEach(option => (option.selected = false));
+  document.getElementById("budget").value = "1000";
+
+  // Clear talent dropdowns and repopulate
+  const allTalents = {
+    directors: [
+      { name: "Steven Spielberg", price: 500 },
+      { name: "Quentin Tarantino", price: 450 },
+      { name: "Christopher Nolan", price: 600 },
+      { name: "Martin Scorsese", price: 550 },
+      { name: "Ridley Scott", price: 400 },
+      { name: "David Fincher", price: 480 },
+      { name: "Kathryn Bigelow", price: 420 },
+      { name: "James Cameron", price: 700 },
+      { name: "Denis Villeneuve", price: 460 },
+      { name: "Guillermo del Toro", price: 430 },
+      { name: "Ang Lee", price: 410 },
+      { name: "Ava DuVernay", price: 470 },
+      { name: "Greta Gerwig", price: 440 },
+      { name: "Bong Joon-ho", price: 490 },
+      { name: "Alfonso Cuarón", price: 510 },
+      { name: "Lila Chen", price: 200 },
+      { name: "Amir Hossein", price: 180 },
+      { name: "Sofia Marquez", price: 220 },
+      { name: "Jaden Park", price: 190 },
+      { name: "Isabella Cortez", price: 20000 },
+      { name: "Marcus Velluto", price: 50000 },
+      { name: "Elena Kwan", price: 100000 },
+      { name: "Tunde Kelani", price: 28000 },
+      { name: "Kunle Afolayan", price: 27000 },
+      { name: "Kemi Adetiba", price: 25000 },
+      { name: "Tope Oshin", price: 23000 },
+      { name: "Femi Odugbemi", price: 22000 },
+      { name: "Viktor Stahl", price: 200000 }
+    ],
+    actors: [
+      { name: "Tom Hanks", price: 300 },
+      { name: "Emma Stone", price: 250 },
+      { name: "Robert De Niro", price: 350 },
+      { name: "Scarlett Johansson", price: 280 },
+      { name: "Brad Pitt", price: 320 },
+      { name: "Natalie Portman", price: 270 },
+      { name: "Leonardo DiCaprio", price: 400 },
+      { name: "Meryl Streep", price: 310 },
+      { name: "Ryan Gosling", price: 290 },
+      { name: "Anne Hathaway", price: 260 },
+      { name: "Denzel Washington", price: 340 },
+      { name: "Jennifer Lawrence", price: 300 },
+      { name: "Zendaya", price: 330 },
+      { name: "Timothée Chalamet", price: 310 },
+      { name: "Viola Davis", price: 360 },
+      { name: "Chris Hemsworth", price: 340 },
+      { name: "Maya Torres", price: 150 },
+      { name: "Liam Chen", price: 140 },
+      { name: "Aisha Khan", price: 160 },
+      { name: "Elliot Brooks", price: 130 },
+      { name: "Sophia Blake", price: 20000 },
+      { name: "Ethan Caldwell", price: 50000 },
+      { name: "Aria Nguyen", price: 100000 },
+      { name: "Odunlade Adekola", price: 25000 },
+      { name: "Femi Adebayo", price: 22000 },
+      { name: "Wunmi Toriola", price: 20000 },
+      { name: "Fathia Williams", price: 21000 },
+      { name: "Itele D Icon", price: 23000 },
+      { name: "Ogboluke", price: 19000 },
+      { name: "Nino Bolanle", price: 24000 },
+      { name: "Mercy Aigbe", price: 26000 },
+      { name: "Funke Akindele", price: 30000 },
+      { name: "Omoni Oboli", price: 21000 },
+      { name: "Julian Rex", price: 200000 }
+    ],
+    composers: [
+      { name: "Hans Zimmer", price: 350 },
+      { name: "John Williams", price: 400 },
+      { name: "Ennio Morricone", price: 300 },
+      { name: "Danny Elfman", price: 320 },
+      { name: "Alexandre Desplat", price: 340 },
+      { name: "Ludovico Einaudi", price: 310 },
+      { name: "Nia Foster", price: 170 },
+      { name: "Ravi Patel", price: 150 },
+      { name: "Liam Voss", price: 20000 },
+      { name: "Clara Moreno", price: 50000 },
+      { name: "Adrian Holt", price: 100000 },
+      { name: "Sylvia Dawn", price: 150000 }
+    ],
+    cinematographers: [
+      { name: "Roger Deakins", price: 380 },
+      { name: "Emmanuel Lubezki", price: 360 },
+      { name: "Robert Richardson", price: 340 },
+      { name: "Hoyte van Hoytema", price: 370 },
+      { name: "Greig Fraser", price: 350 },
+      { name: "Elena Voss", price: 180 },
+      { name: "Kai Nakamura", price: 160 },
+      { name: "Nora Fielding", price: 20000 },
+      { name: "Ezra Kline", price: 50000 },
+      { name: "Mateo Silva", price: 100000 },
+      { name: "CJ Obasi", price: 24000 },
+      { name: "Yinka Edward", price: 23000 },
+      { name: "Tunde Adekoya", price: 22000 },
+      { name: "Olivia Grant", price: 150000 }
+    ],
+    others: [
+      { name: "Costume Designer (Sandy Powell)", price: 200 },
+      { name: "Production Designer (Dante Ferretti)", price: 250 },
+      { name: "Editor (Thelma Schoonmaker)", price: 230 },
+      { name: "VFX Supervisor (Joe Letteri)", price: 270 },
+      { name: "Sound Designer (Ben Burtt)", price: 260 },
+      { name: "Costume Designer (Maria Gomez)", price: 120 },
+      { name: "Editor (Sam Lee)", price: 100 },
+      { name: "VFX Supervisor (Zara Lin)", price: 20000 },
+      { name: "Production Designer (Theo Ramsey)", price: 50000 },
+      { name: "Editor (Lena Harper)", price: 100000 },
+      { name: "Tunde Babalola", price: 20000 },
+      { name: "Chris Ihidero", price: 19000 },
+      { name: "Sound Designer (Maxine Cole)", price: 150000 }
+    ]
+  };
+
+  // Clear and repopulate talent dropdowns
+  const assignedTalents = player.movies.flatMap(m => m.talents.map(t => t.name));
+  const populateDropdown = (selectId, talents) => {
+    const select = document.getElementById(selectId);
+    select.innerHTML = `<option value="">Select ${selectId.replace('Select', '')}(s)</option>`;
+    talents.forEach(talent => {
+      if (!assignedTalents.includes(talent.name) || 
+          player.movies.find(m => m.talents.some(t => t.name === talent.name) && m.released)) {
+        const option = document.createElement("option");
+        option.value = JSON.stringify(talent);
+        option.innerText = `${talent.name} ($${formatNumber("money", talent.price)})`;
+        select.appendChild(option);
+      }
+    });
+  };
+
+  populateDropdown("directorSelect", allTalents.directors);
+  populateDropdown("actorSelect", allTalents.actors);
+  populateDropdown("composerSelect", allTalents.composers);
+  populateDropdown("cinematographerSelect", allTalents.cinematographers);
+  populateDropdown("otherSelect", allTalents.others);
+
+  // Handle sequel/season selection to pre-select genres, title, and duration
+  sequelOrSeasonSelect.onchange = function() {
+    const selectedValue = this.value;
+    const genreSelect = document.getElementById("genres");
+    Array.from(genreSelect.options).forEach(option => (option.selected = false));
+    let baseMovie, isStreaming = false, isYouTube = false;
+    if (selectedValue !== "") {
+      if (selectedValue.startsWith("s_")) {
+        baseMovie = player.streamingMovies[parseInt(selectedValue.split("_")[1])];
+        isStreaming = true;
+      } else if (selectedValue.startsWith("y_")) {
+        baseMovie = player.youtubeVideos[parseInt(selectedValue.split("_")[1])];
+        isYouTube = true;
+      } else {
+        baseMovie = player.movies[parseInt(selectedValue)];
+      }
+      document.getElementById("movieType").value = baseMovie.type === "season" || baseMovie.type === "mini-series" ? baseMovie.type : "feature";
+      if (baseMovie.type === "season" || baseMovie.type === "mini-series") {
+        document.getElementById("episodeInput").style.display = "block";
+      } else {
+        document.getElementById("episodeInput").style.display = "none";
+      }
+      // Pre-select genres from the base movie
+      const genres = isYouTube ? baseMovie.genre.split(", ") : baseMovie.genres;
+      genres.forEach(genre => {
+        const option = Array.from(genreSelect.options).find(opt => opt.value === genre);
+        if (option) option.selected = true;
+      });
+      if (baseMovie.type === "season" || baseMovie.type === "mini-series") {
+        const seasonNumber = [...player.movies, ...player.streamingMovies, ...player.youtubeVideos]
+          .filter(m => m.title.includes(baseMovie.title.split(": Season")[0]) && 
+                      (m.type === "season" || m.type === "mini-series")).length + 1;
+        document.getElementById("movieTitle").value = `${baseMovie.title.split(": Season")[0]}: Season ${seasonNumber}`;
+      } else {
+        const sequelNumber = [...player.movies, ...player.streamingMovies, ...player.youtubeVideos]
+          .filter(m => m.title.includes(baseMovie.title.split(" Part")[0]) && 
+                      m.type !== "season" && m.type !== "mini-series").length + 1;
+        document.getElementById("movieTitle").value = `${baseMovie.title.split(" Part")[0]} Part ${sequelNumber}`;
+      }
+      // Set duration from base movie if available
+      document.getElementById("movieDuration").value = baseMovie.duration || 90;
+    } else {
+      document.getElementById("movieType").value = "feature";
+      document.getElementById("episodeInput").style.display = "none";
+      document.getElementById("movieTitle").value = "";
+      document.getElementById("movieDuration").value = "90";
+      Array.from(genreSelect.options).forEach(option => (option.selected = false));
+    }
+  };
+}
+
+    function closeMovieCreation() {
+      document.getElementById("movieCreation").style.display = "none";
+      document.getElementById("game").style.display = "block";
+    }
+
+    function createMovie() {
+  const sequelOrSeasonIndex = document.getElementById("sequelOrSeasonSelect").value;
+  let title = document.getElementById("movieTitle").value.trim();
+  const movieType = document.getElementById("movieType").value;
+  const budget = parseInt(document.getElementById("budget").value);
+  const episodeCount = (movieType === "season" || movieType === "mini-series") ? parseInt(document.getElementById("episodeCount").value) || 1 : 1;
+  const duration = parseInt(document.getElementById("movieDuration").value) || 90; // Default to 90 minutes
+  const genreSelect = document.getElementById("genres");
+  let selectedGenres = Array.from(genreSelect.selectedOptions).map(option => option.value);
+  let genres = selectedGenres.length > 0 ? selectedGenres : [];
+
+  const directorSelect = document.getElementById("directorSelect");
+  const actorSelect = document.getElementById("actorSelect");
+  const composerSelect = document.getElementById("composerSelect");
+  const cinematographerSelect = document.getElementById("cinematographerSelect");
+  const otherSelect = document.getElementById("otherSelect");
+
+  const selectedTalents = [];
+  let totalTalentCost = 0;
+
+  // Collect selected talents and calculate total cost
+  [directorSelect, actorSelect, composerSelect, cinematographerSelect, otherSelect].forEach(select => {
+    Array.from(select.selectedOptions).forEach(option => {
+      if (option.value !== "") {
+        const talent = JSON.parse(option.value);
+        selectedTalents.push(talent);
+        totalTalentCost += talent.price;
+      }
+    });
+  });
+
+  // Validate duration based on movie type
+  let minDuration, maxDuration;
+  if (movieType === "short") {
+    minDuration = 10;
+    maxDuration = 60;
+  } else if (movieType === "feature") {
+    minDuration = 60;
+    maxDuration = 180;
+  } else if (movieType === "season" || movieType === "mini-series") {
+    minDuration = 20;
+    maxDuration = 60;
+  }
+  if (duration < minDuration || duration > maxDuration) {
+    alert(`Duration must be between ${minDuration} and ${maxDuration} minutes for ${movieType} films!`);
+    return;
+  }
+
+  // Other validation checks
+  if (title === "") {
+    alert("Please enter a movie title!");
+    return;
+  }
+  if (genres.length === 0) {
+    alert("Please select at least one genre!");
+    return;
+  }
+  if (genres.length > 4) {
+    alert("You can select up to 4 genres only!");
+    return;
+  }
+  if (player.money < budget + totalTalentCost) {
+    alert(`Not enough money! Need $${formatNumber("money", budget + totalTalentCost)} (Budget: $${formatNumber("money", budget)}, Talents: $${formatNumber("money", totalTalentCost)}).`);
+    return;
+  }
+  if ((movieType === "season" || movieType === "mini-series") && (episodeCount < 1 || episodeCount > 10)) {
+    alert("Episode count must be between 1 and 10!");
+    return;
+  }
+  if (!directorSelect.selectedOptions.length || !actorSelect.selectedOptions.length || 
+      !composerSelect.selectedOptions.length || !cinematographerSelect.selectedOptions.length || 
+      !otherSelect.selectedOptions.length) {
+    alert("You must select at least one talent from each category (Director, Actor, Composer, Cinematographer, Other)!");
+    return;
+  }
+
+  // Handle sequel or season logic
+  let baseGenres = [];
+  if (sequelOrSeasonIndex !== "") {
+    let baseMovie, isStreaming = false, isYouTube = false;
+    if (sequelOrSeasonIndex.startsWith("s_")) {
+      baseMovie = player.streamingMovies[parseInt(sequelOrSeasonIndex.split("_")[1])];
+      isStreaming = true;
+    } else if (sequelOrSeasonIndex.startsWith("y_")) {
+      baseMovie = player.youtubeVideos[parseInt(sequelOrSeasonIndex.split("_")[1])];
+      isYouTube = true;
+    } else {
+      baseMovie = player.movies[parseInt(sequelOrSeasonIndex)];
+    }
+
+    // Get base genres
+    baseGenres = isYouTube ? baseMovie.genre.split(", ") : baseMovie.genres;
+    
+    // Merge genres and ensure no more than 4 total
+    const newGenres = [...new Set([...baseGenres, ...genres])];
+    if (newGenres.length > 4) {
+      alert("Total genres (including base movie genres) cannot exceed 4!");
+      return;
+    }
+    genres = newGenres;
+
+    // Validate movie type for sequels/seasons
+    if ((baseMovie.type === "season" || baseMovie.type === "mini-series") && 
+        (movieType !== "season" && movieType !== "mini-series")) {
+      alert("Next season must be a Season Film or Mini-Series!");
+      return;
+    }
+    if ((baseMovie.type === "feature" || baseMovie.type === "short") && 
+        (movieType === "season" || movieType === "mini-series")) {
+      alert("Sequels for non-season films cannot be Season Films or Mini-Series!");
+      return;
+    }
+
+    // Ensure title reflects sequel or season
+    if (baseMovie.type === "season" || baseMovie.type === "mini-series") {
+      const seasonNumber = [...player.movies, ...player.streamingMovies, ...player.youtubeVideos]
+        .filter(m => m.title.includes(baseMovie.title.split(": Season")[0]) && 
+                    (m.type === "season" || m.type === "mini-series")).length + 1;
+      title = `${baseMovie.title.split(": Season")[0]}: Season ${seasonNumber}`;
+    } else {
+      const sequelNumber = [...player.movies, ...player.streamingMovies, ...player.youtubeVideos]
+        .filter(m => m.title.includes(baseMovie.title.split(" Part")[0]) && 
+                    m.type !== "season" && m.type !== "mini-series").length + 1;
+      title = `${baseMovie.title.split(" Part")[0]} Part ${sequelNumber}`;
+    }
+  }
+
+  // Calculate high-cost talent multiplier
+  let talentMultiplier = 1;
+  const highCostTalents = selectedTalents.filter(t => t.price >= 20000);
+  if (highCostTalents.length > 0) {
+    const highestPrice = Math.max(...highCostTalents.map(t => t.price));
+    if (highestPrice >= 100001) {
+      talentMultiplier = 4 + (highCostTalents.length - 1) * 0.5;
+    } else if (highestPrice >= 50001) {
+      talentMultiplier = 3 + (highCostTalents.length - 1) * 0.5;
+    } else {
+      talentMultiplier = 2 + (highCostTalents.length - 1) * 0.5;
+    }
+  }
+
+  // Calculate duration multiplier (realistic impact)
+  let durationMultiplier = 1;
+  if (movieType === "short") {
+    durationMultiplier = duration / 30; // Normalize to 30-minute baseline (e.g., 60 min = 2x)
+  } else if (movieType === "feature") {
+    durationMultiplier = duration / 90; // Normalize to 90-minute baseline
+  } else if (movieType === "season" || movieType === "mini-series") {
+    durationMultiplier = duration / 45; // Normalize to 45-minute per episode baseline
+  }
+  // Apply diminishing returns for very long durations
+  if (durationMultiplier > 2) {
+    durationMultiplier = 2 + (durationMultiplier - 2) * 0.5; // Diminishing returns beyond 2x
+  }
+
+  // Adjust production weeks based on duration
+  let productionWeeksRequired = (movieType === "season" || movieType === "mini-series") 
+    ? 8 + (episodeCount * 2) 
+    : (movieType === "short") ? 4 : 8;
+  productionWeeksRequired = Math.floor(productionWeeksRequired * Math.max(0.5, durationMultiplier));
+
+  // Deduct costs and update fame
+  player.money -= (budget + totalTalentCost);
+  player.fame += Math.floor(budget / 500);
+
+  // Create the new movie object with duration
+  let movie = {
+    title: title,
+    type: movieType,
+    genres: genres,
+    budget: budget,
+    episodeCount: episodeCount,
+    duration: duration, // Store duration in minutes
+    fansPerSec: Math.floor((budget / 50) * ((movieType === "season" || movieType === "mini-series") ? episodeCount : 1) * talentMultiplier * durationMultiplier),
+    revenuePerSec: Math.floor((budget / 25) * ((movieType === "season" || movieType === "mini-series") ? episodeCount : 1) * talentMultiplier * durationMultiplier),
+    talents: selectedTalents,
+    released: false,
+    productionStartWeek: player.week,
+    productionWeeksRequired: productionWeeksRequired
+  };
+
+  // Add movie to player's movies
+  player.movies.push(movie);
+
+  // Update UI and save game state
+  document.getElementById("money").innerText = formatNumber("money", player.money);
+  document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+  
+  // Update movie panel if open
+  const movieListContainer = document.getElementById("movieList");
+  if (movieListContainer) {
+    renderMoviesInPanel(movieListContainer);
+  }
+
+  // Notify user and close form
+  alert(`🎬 "${title}" has started production! Duration: ${duration} minutes. Check the Movies panel to see its progress.${talentMultiplier > 1 ? ` High-profile talent boost: ${talentMultiplier}x fans and revenue!` : ""}${durationMultiplier !== 1 ? ` Duration impact: ${durationMultiplier.toFixed(2)}x fans and revenue!` : ""}`);
+  closeMovieCreation();
+}
+
+    function renderMoviesInPanel(container) {
+  container.innerHTML = "";
+  const platforms = [
+    { name: "IndieFlicks", fameRequired: 0, cost: 100, weeklyRevenue: 10, weeklyFans: 50, fameBoost: 10, description: "A niche platform for independent films." },
+    { name: "Hula", fameRequired: 500, cost: 300, weeklyRevenue: 20, weeklyFans: 100, fameBoost: 25, description: "A growing platform with a broad audience." },
+    { name: "PrimeView", fameRequired: 1000, cost: 500, weeklyRevenue: 30, weeklyFans: 150, fameBoost: 50, description: "A major platform with global reach." },
+    { name: "DisStream", fameRequired: 2000, cost: 800, weeklyRevenue: 40, weeklyFans: 200, fameBoost: 75, description: "A premium platform for family content." },
+    { name: "AppleStream", fameRequired: 3000, cost: 1000, weeklyRevenue: 50, weeklyFans: 250, fameBoost: 100, description: "A high-end platform for prestige films." },
+    { name: "StreamFlix", fameRequired: 5000, cost: 1500, weeklyRevenue: 75, weeklyFans: 400, fameBoost: 150, description: "The dominant streaming service." },
+    { name: "VibeStream", fameRequired: 700, cost: 400, weeklyRevenue: 25, weeklyFans: 120, fameBoost: 30, description: "A trendy platform for young audiences." },
+    { name: "GlobeFlix", fameRequired: 1500, cost: 600, weeklyRevenue: 35, weeklyFans: 180, fameBoost: 60, description: "A global platform with diverse content." },
+    { name: "StarCast", fameRequired: 2500, cost: 900, weeklyRevenue: 45, weeklyFans: 220, fameBoost: 85, description: "A platform focused on star-driven blockbusters." },
+    { name: "EpicView", fameRequired: 4000, cost: 1200, weeklyRevenue: 60, weeklyFans: 300, fameBoost: 120, description: "A premium service for epic storytelling." },
+    { name: "NexGenTV", fameRequired: 6000, cost: 1800, weeklyRevenue: 90, weeklyFans: 500, fameBoost: 200, description: "A cutting-edge platform for innovative content." },
+  ];
+
+  player.movies.forEach((m, index) => {
+    let div = document.createElement("div");
+    div.className = "movie";
+    div.innerHTML = `
+      <h3 style="margin: 0 0 8px; color: #FFD700; font-size: 16px;">🎬 ${m.title}</h3>
+      <p><strong>Type:</strong> ${m.type}</p>
+      <p><strong>Genres:</strong> ${m.genres.join(", ")}</p>
+      <p><strong>Budget:</strong> $${formatNumber("money", m.budget)}</p>
+      <p><strong>Duration:</strong> ${m.duration} minutes</p>
+      <p><strong>Episodes:</strong> ${m.episodeCount}</p>
+      <p><strong>Fan Growth:</strong> +${formatNumber("fans", m.weeklyFans || m.fansPerSec)} fans/sec</p>
+      <p><strong>Revenue:</strong> +$${formatNumber("money", m.weeklyRevenue || m.revenuePerSec)}/sec</p>
+      <p><strong>Status:</strong> ${m.released ? `Released on ${m.platform || "Streaming"}` : "In Production"}</p>
+      <p><strong>Weeks Remaining:</strong> ${calculateWeeksRemaining(m)}</p>
+      <h4 style="margin: 8px 0 4px; font-size: 14px;">🎭 Talents:</h4>
+      <ul style="margin: 0 0 8px; padding-left: 15px; text-align: left;">
+        ${m.talents.length > 0 ? m.talents.map((t) => `<li>${t.name}</li>`).join("") : "<li>None</li>"}
+      </ul>
+      <p><strong>Awards:</strong> ${player.awards.filter(a => a.title === m.title).map(a => a.name).join(", ") || "None"}</p>
+    `;
+
+    if (!m.released && checkReleaseConditions(m)) {
+      let releaseSelect = document.createElement("select");
+      releaseSelect.id = `releaseOption_${index}`;
+      releaseSelect.style = "margin-top: 3px; padding: 6px; width: 90%; border-radius: 8px; border: none;";
+      let youtubeOption = document.createElement("option");
+      youtubeOption.value = "youtube";
+      youtubeOption.innerText = "Release to YouTube";
+      releaseSelect.appendChild(youtubeOption);
+
+      platforms.forEach((platform) => {
+        if (player.fame >= platform.fameRequired) {
+          let option = document.createElement("option");
+          option.value = JSON.stringify(platform);
+          option.innerText = `Release to ${platform.name} (Cost: $${formatNumber("money", platform.cost)})`;
+          releaseSelect.appendChild(option);
+        }
+      });
+
+      let releaseButton = document.createElement("button");
+      releaseButton.innerText = "Release";
+      releaseButton.onclick = function () {
+        let selectedPlatform = releaseSelect.value;
+        if (selectedPlatform === "youtube") {
+          m.released = true;
+          const durationMultiplier = m.duration / (m.type === "short" ? 30 : m.type === "feature" ? 90 : 45);
+          const adjustedMultiplier = durationMultiplier > 2 ? 2 + (durationMultiplier - 2) * 0.5 : durationMultiplier;
+          const initialViews = Math.floor(m.budget * 100 * adjustedMultiplier + player.fame * 10 + Math.random() * 500);
+          const initialLikes = Math.floor(initialViews * 0.03);
+          const initialComments = Math.floor(initialViews * 0.01);
+          const initialShares = Math.floor(initialViews * 0.002);
+          const newSubscribers = Math.floor(initialViews * 0.03 + player.fame * 0.05);
+          const earnings = Math.floor(initialViews / 1000 * 3);
+          const highProfileTalents = m.talents.filter((t) => t.price >= 400).length;
+          const viralChance = Math.min(0.5, 0.05 + (m.budget / 100) * 0.05 + player.fame * 0.02 + highProfileTalents * 0.05);
+          const isViral = Math.random() < viralChance;
+          player.subscribers += newSubscribers;
+          player.totalViews += initialViews;
+          player.youtubeEarnings += earnings;
+          player.money += earnings;
+          player.youtubeVideos.push({
+            title: m.title,
+            genre: m.genres.join(", "),
+            views: initialViews,
+            likes: initialLikes,
+            comments: initialComments,
+            shares: initialShares,
+            growthRate: isViral ? 0.10 : 0.05,
+            weeksSinceRelease: 0,
+            isViral: isViral,
+            thumbnail: getGenreThumbnail(m.genres[0]),
+            isSeries: m.type === "season" || m.type === "mini-series",
+            currentEpisode: (m.type === "season" || m.type === "mini-series") ? 1 : m.episodeCount,
+            totalEpisodes: m.episodeCount,
+            weeksSinceLastEpisode: 0,
+            weeklyFans: Math.floor(m.fansPerSec * adjustedMultiplier),
+            weeklyRevenue: Math.floor(m.revenuePerSec * adjustedMultiplier)
+          });
+          checkSubscriberMilestones();
+          const youtubeContainer = document.getElementById("youtubeVideoList");
+          if (youtubeContainer) {
+            renderYouTubeVideos(youtubeContainer);
+          }
+          document.getElementById("money").innerText = formatNumber("money", player.money);
+          alert(
+            `${m.title} ${m.type === "season" || m.type === "mini-series" ? `Episode 1` : ""} has been released to YouTube! Gained ${formatNumber("fans", newSubscribers)} subscribers and earned $${formatNumber("money", earnings)}.${isViral ? " It's gone viral!" : ""}`
+          );
+          player.movies.splice(index, 1);
+          renderMoviesInPanel(container);
+        } else {
+          const platform = JSON.parse(selectedPlatform);
+          if (player.money < platform.cost) {
+            alert(`Not enough money! Need $${formatNumber("money", platform.cost)}.`);
+            return;
+          }
+          const budgetMultiplier = m.budget === 1000 ? 1 : m.budget === 2500 ? 1.5 : m.budget === 5000 ? 2 : m.budget === 7500 ? 2.5 : 3;
+          const episodeMultiplier = (m.type === "season" || m.type === "mini-series") ? 1 : 1;
+          let talentMultiplier = 1;
+          const highCostTalents = m.talents.filter((t) => t.price >= 20000);
+          if (highCostTalents.length > 0) {
+            const highestPrice = Math.max(...highCostTalents.map(t => t.price));
+            if (highestPrice >= 100001) {
+              talentMultiplier = 4;
+            } else if (highestPrice >= 50001) {
+              talentMultiplier = 3;
+            } else {
+              talentMultiplier = 2;
+            }
+          }
+          const durationMultiplier = m.duration / (m.type === "short" ? 30 : m.type === "feature" ? 90 : 45);
+          const adjustedMultiplier = durationMultiplier > 2 ? 2 + (durationMultiplier - 2) * 0.5 : durationMultiplier;
+          const totalMultiplier = budgetMultiplier * episodeMultiplier * talentMultiplier * adjustedMultiplier;
+
+          player.money -= platform.cost;
+          player.fame += platform.fameBoost;
+          player.fans += Math.floor(platform.weeklyFans * totalMultiplier);
+          m.released = true;
+          m.platform = platform.name;
+          m.weeklyRevenue = Math.floor(platform.weeklyRevenue * totalMultiplier);
+          m.weeklyFans = Math.floor(platform.weeklyFans * totalMultiplier);
+          m.weeksSinceRelease = 0;
+          m.currentEpisode = (m.type === "season" || m.type === "mini-series") ? 1 : m.episodeCount;
+          m.weeksSinceLastEpisode = 0;
+
+          player.streamingMovies.push(m);
+          player.movies.splice(index, 1);
+
+          document.getElementById("money").innerText = formatNumber("money", player.money);
+          document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+          document.getElementById("fans").innerText = formatNumber("fans", player.fans);
+          alert(
+            `🎬 ${m.title} ${m.type === "season" || m.type === "mini-series" ? `Episode ${m.currentEpisode}` : ""} has been released on ${platform.name}! Paid $${formatNumber(
+              "money",
+              platform.cost
+            )}, gained ${formatNumber("fame", platform.fameBoost)} fame and ${formatNumber(
+              "fans",
+              platform.weeklyFans * totalMultiplier
+            )} fans.${talentMultiplier > 1 ? ` High-profile talent boost: ${talentMultiplier}x fans and revenue!` : ""}${adjustedMultiplier !== 1 ? ` Duration impact: ${adjustedMultiplier.toFixed(2)}x fans and revenue!` : ""}`
+          );
+          renderMoviesInPanel(container);
+          renderStreamingMovies(document.getElementById("streamingMoviesList") || document.createElement("div"));
+        }
+      };
+      releaseButton.style = "margin-top: 3px; padding: 6px; width: 90%; border-radius: 8px; border: none; background: #ff9800; color: white; font-weight: bold; cursor: pointer;";
+      releaseButton.onmouseover = function () {
+        this.style.background = "#e67e22";
+      };
+      releaseButton.onmouseout = function () {
+        this.style.background = "#ff9800";
+      };
+
+      div.appendChild(releaseSelect);
+      div.appendChild(releaseButton);
+    }
+    container.appendChild(div);
+  });
+}
+
+    function showMovies() {
+  const existingPanel = document.getElementById("moviePanel");
+  if (existingPanel) {
+    existingPanel.remove();
+  }
+
+  let moviePanel = document.createElement("div");
+  moviePanel.id = "moviePanel";
+  
+  let movieList = document.createElement("div");
+  movieList.id = "movieList";
+  renderMoviesInPanel(movieList);
+  
+  let closeButton = document.createElement("button");
+  closeButton.innerText = "Close";
+  closeButton.onclick = function() {
+    moviePanel.remove();
+  };
+  closeButton.style = "margin-top: 8px; padding: 8px; width: 100%; border-radius: 8px; border: none; background: #ff9800; color: white; font-weight: bold; cursor: pointer;";
+  closeButton.onmouseover = function() { this.style.background = "#e67e22"; };
+  closeButton.onmouseout = function() { this.style.background = "#ff9800"; };
+
+  let header = document.createElement("h2");
+  header.innerText = " Movies ";
+  header.style = "margin-bottom: 10px; font-size: 18px; text-shadow: 1px 1px 2px #000;";
+  
+  moviePanel.appendChild(header);
+  moviePanel.appendChild(movieList);
+  moviePanel.appendChild(closeButton);
+  
+  document.body.appendChild(moviePanel); // Append to body for fixed positioning
+}
+
+    function calculateWeeksRemaining(movie) {
+      if (movie.released) return 0;
+      const weeks = ["January 1st", "January 8th", "January 15th", "January 22nd", "January 29th",
+                     "February 5th", "February 12th", "February 19th", "February 26th",
+                     "March 5th", "March 12th", "March 19th", "March 26th",
+                     "April 2nd", "April 9th", "April 16th", "April 23rd", "April 30th",
+                     "May 7th", "May 14th", "May 21st", "May 28th",
+                     "June 4th", "June 11th", "June 18th", "June 25th",
+                     "July 2nd", "July 9th", "July 16th", "July 23rd", "July 30th",
+                     "August 6th", "August 13th", "August 20th", "August 27th",
+                     "September 3rd", "September 10th", "September 17th", "September 24th",
+                     "October 1st", "October 8th", "October 15th", "October 22nd", "October 29th",
+                     "November 5th", "November 12th", "November 19th", "November 26th",
+                     "December 3rd", "December 10th", "December 17th", "December 24th"];
+      let startIndex = weeks.indexOf(movie.productionStartWeek);
+      let currentIndex = weeks.indexOf(player.week);
+      let weeksPassed = (currentIndex - startIndex + 52) % 52;
+      let weeksRemaining = movie.productionWeeksRequired - weeksPassed;
+      return weeksRemaining > 0 ? weeksRemaining : 0;
+    }
+
+    function checkReleaseConditions(movie) {
+  const requiredCategories = ["directors", "actors", "composers", "cinematographers", "others"];
+  const talentNames = movie.talents.map(t => t.name);
+  const categoryTalents = {
+    directors: [
+      "Steven Spielberg", "Quentin Tarantino", "Christopher Nolan", "Martin Scorsese", "Ridley Scott", 
+      "David Fincher", "Kathryn Bigelow", "James Cameron", "Denis Villeneuve", "Guillermo del Toro", 
+      "Ang Lee", "Ava DuVernay", "Greta Gerwig", "Bong Joon-ho", "Alfonso Cuar�n", 
+      "Lila Chen", "Amir Hossein", "Sofia Marquez", "Jaden Park",
+      "Isabella Cortez", "Marcus Velluto", "Elena Kwan", "Viktor Stahl"
+    ],
+    actors: [
+      "Tom Hanks", "Emma Stone", "Robert De Niro", "Scarlett Johansson", "Brad Pitt", 
+      "Natalie Portman", "Leonardo DiCaprio", "Meryl Streep", "Ryan Gosling", "Anne Hathaway", 
+      "Denzel Washington", "Jennifer Lawrence", "Zendaya", "Timoth�e Chalamet", "Viola Davis", 
+      "Chris Hemsworth", "Maya Torres", "Liam Chen", "Aisha Khan", "Elliot Brooks",
+      "Sophia Blake", "Ethan Caldwell", "Aria Nguyen", "Julian Rex"
+    ],
+    composers: [
+      "Hans Zimmer", "John Williams", "Ennio Morricone", "Danny Elfman", 
+      "Alexandre Desplat", "Ludovico Einaudi", "Nia Foster", "Ravi Patel",
+      "Liam Voss", "Clara Moreno", "Adrian Holt", "Sylvia Dawn"
+    ],
+    cinematographers: [
+      "Roger Deakins", "Emmanuel Lubezki", "Robert Richardson", 
+      "Hoyte van Hoytema", "Greig Fraser", "Elena Voss", "Kai Nakamura",
+      "Nora Fielding", "Ezra Kline", "Mateo Silva", "Olivia Grant"
+    ],
+    others: [
+      "Costume Designer (Sandy Powell)", "Production Designer (Dante Ferretti)", 
+      "Editor (Thelma Schoonmaker)", "VFX Supervisor (Joe Letteri)", "Sound Designer (Ben Burtt)", 
+      "Costume Designer (Maria Gomez)", "Editor (Sam Lee)",
+      "VFX Supervisor (Zara Lin)", "Production Designer (Theo Ramsey)", 
+      "Editor (Lena Harper)", "Sound Designer (Maxine Cole)"
+    ]
+  };
+  return requiredCategories.every(category => talentNames.some(name => categoryTalents[category].includes(name))) && 
+         calculateWeeksRemaining(movie) <= 0;
+}
+
+    function checkSubscriberMilestones() {
+      const milestones = [1000, 10000, 50000, 100000, 500000, 1000000];
+      milestones.forEach(milestone => {
+        if (player.subscribers >= milestone && !player.milestonesAchieved.includes(milestone)) {
+          alert(`🎉 Congratulations! Your YouTube channel reached ${milestone.toLocaleString()} subscribers!`);
+          player.milestonesAchieved.push(milestone);
+        }
+      });
+    }
+
+function showStreamingMovies() {
+    const existingPanel = document.getElementById("streamingMoviesPanel");
+    if (existingPanel) {
+        existingPanel.remove();
+    }
+
+    let streamingMoviesPanel = document.createElement("div");
+    streamingMoviesPanel.id = "streamingMoviesPanel";
+
+    let streamingMoviesList = document.createElement("div");
+    streamingMoviesList.id = "streamingMoviesList";
+    renderStreamingMovies(streamingMoviesList);
+
+    let closeButton = document.createElement("button");
+    closeButton.innerText = "Close";
+    closeButton.onclick = closeStreamingMovies;
+
+    let header = document.createElement("h2");
+    header.innerText = " Streaming Movies";
+
+    streamingMoviesPanel.appendChild(header);
+    streamingMoviesPanel.appendChild(streamingMoviesList);
+    streamingMoviesPanel.appendChild(closeButton);
+
+    document.body.appendChild(streamingMoviesPanel);
+}
+
+function closeStreamingMovies() {
+    const streamingMoviesPanel = document.getElementById("streamingMoviesPanel");
+    if (streamingMoviesPanel) {
+        streamingMoviesPanel.remove();
+    }
+}
+
+function renderStreamingMovies(container) {
+  container.innerHTML = ""; // Clear the container
+  player.streamingMovies.forEach((m, index) => {
+    let div = document.createElement("div");
+    div.className = "streaming-movie";
+    div.innerHTML = `
+      <h3 class="movie-title">🎬 ${m.title}</h3>
+      <p><strong>Platform:</strong> ${m.platform}</p>
+      <p><strong>Type:</strong> ${m.type}</p>
+      <p><strong>Genres:</strong> ${m.genres.join(", ")}</p>
+      <p><strong>Budget:</strong> $${formatNumber("money", m.budget)}</p>
+      <p><strong>Duration:</strong> ${m.duration} minutes</p>
+      <p><strong>Episode Released:</strong> ${m.currentEpisode || 1}/${m.episodeCount}</p>
+      <p><strong>Weekly Fans:</strong> +${formatNumber("fans", m.weeklyFans)}</p>
+      <p><strong>Weekly Revenue:</strong> +$${formatNumber("money", m.weeklyRevenue)}</p>
+      <p><strong>Weeks Since Release:</strong> ${m.weeksSinceRelease}</p>
+      <p><strong>Status:</strong> ${m.released ? "Released" : "Pending Episode Release"}</p>
+      <p><strong>Awards:</strong> ${
+        player.awards.filter(a => a.title === m.title).map(a => a.name).join(", ") || "None"
+      }</p>
+      ${
+        (m.type === "season" || m.type === "mini-series") &&
+        m.currentEpisode < m.episodeCount &&
+        m.weeksSinceLastEpisode >= 2
+          ? `<button class="release-episode" data-index="${index}">Release Episode ${m.currentEpisode + 1}</button>`
+          : ""
+      }
+    `;
+    container.appendChild(div);
+  });
+
+  // Add event delegation for buttons
+  container.addEventListener("click", (e) => {
+    if (e.target.classList.contains("release-episode")) {
+      const index = parseInt(e.target.dataset.index);
+      releaseNextEpisode(index);
+    }
+  });
+}
+
+    function gameLoop() {
+  setInterval(() => {
+    // Update UI elements to reflect current state
+    document.getElementById("fans").innerText = formatNumber("fans", player.fans);
+    document.getElementById("money").innerText = formatNumber("money", player.money);
+    document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+    
+    const youtubeContainer = document.getElementById("youtubeVideoList");
+    if (youtubeContainer) {
+      renderYouTubeVideos(youtubeContainer);
+    }
+    const streamingContainer = document.getElementById("streamingMoviesList");
+    if (streamingContainer) {
+      renderStreamingMovies(streamingContainer);
+    }
+    
+    // Check for movies ready to release and apply campaign fame boosts
+    player.movies.forEach((m) => {
+      if (!m.released && checkReleaseConditions(m) && calculateWeeksRemaining(m) <= 0) {
+        const campaigns = player.activeCampaigns.filter((c) => c.target !== "company" && parseInt(c.target) === player.movies.indexOf(m));
+        campaigns.forEach((campaign) => {
+          if (campaign.releaseFameBoost > 0) {
+            player.fame += campaign.releaseFameBoost;
+            campaign.releaseFameBoost = 0;
+            alert(
+              `🎬 ${m.title} is now ready for release! Gained ${formatNumber("fame", campaign.fame)} fame from ${campaign.type
+                .replace(/([A-Z])/g, " $1")
+                .trim()} campaign anticipation.`
+            );
+          }
+        });
+      }
+    });
+  }, 1000);
+}
+
+    function launchStreamingRelease(movieIndex, platform) {
+  const movie = player.movies[parseInt(movieIndex)];
+  if (player.money < platform.cost) {
+    alert(`Not enough money! Need $${formatNumber("money", platform.cost)}.`);
+    return;
+  }
+
+  const budgetMultiplier = movie.budget === 1000 ? 1 : movie.budget === 2500 ? 1.5 : movie.budget === 5000 ? 2 : movie.budget === 7500 ? 2.5 : 3;
+  const episodeMultiplier = (movie.type === "season" || movie.type === "mini-series") ? movie.episodeCount : 1;
+  // Calculate high-cost talent multiplier
+  let talentMultiplier = 1;
+  const highCostTalents = movie.talents.filter(t => t.price >= 20000);
+  if (highCostTalents.length > 0) {
+    const highestPrice = Math.max(...highCostTalents.map(t => t.price));
+    if (highestPrice >= 100001) {
+      talentMultiplier = 4;
+    } else if (highestPrice >= 50001) {
+      talentMultiplier = 3;
+    } else {
+      talentMultiplier = 2;
+    }
+  }
+  const totalMultiplier = budgetMultiplier * episodeMultiplier * talentMultiplier;
+
+  player.money -= platform.cost;
+  player.fame += platform.fameBoost;
+  player.fans += platform.weeklyFans * totalMultiplier;
+  movie.released = true;
+  movie.platform = platform.name;
+  movie.weeklyRevenue = platform.weeklyRevenue * totalMultiplier;
+  movie.weeklyFans = platform.weeklyFans * totalMultiplier;
+  movie.weeksSinceRelease = 0;
+
+  document.getElementById("money").innerText = formatNumber("money", player.money);
+  document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+  document.getElementById("fans").innerText = formatNumber("fans", player.fans);
+  alert(`🎬 ${movie.title} has been released on ${platform.name}! Paid $${formatNumber("money", platform.cost)}, gained ${formatNumber("fame", platform.fameBoost)} fame and ${formatNumber("fans", platform.weeklyFans * totalMultiplier)} fans.${talentMultiplier > 1 ? ` High-profile talent boost: ${talentMultiplier}x fans and revenue!` : ""}`);
+  closeStreamingPlatform();
+  renderMoviesInPanel(document.getElementById("movieList") || document.createElement("div"));
+}
+
+    function manageYouTubeChannel() {
+      const existingPanel = document.getElementById("youtubePanel");
+      if (existingPanel) {
+        document.body.removeChild(existingPanel);
+      }
+
+      let youtubePanel = document.createElement("div");
+      youtubePanel.id = "youtubePanel";
+
+      let videoList = document.createElement("div");
+      videoList.id = "youtubeVideoList";
+      renderYouTubeVideos(videoList);
+
+      let closeButton = document.createElement("button");
+      closeButton.innerText = "Close";
+      closeButton.onclick = function() {
+        document.body.removeChild(youtubePanel);
+      };
+      closeButton.style = "margin-top: 10px; padding: 10px; width: 100%; border-radius: 8px; border: none; background: #ff9800; color: white; font-weight: bold; cursor: pointer;";
+      closeButton.onmouseover = function() { this.style.background = "#e67e22"; };
+      closeButton.onmouseout = function() { this.style.background = "#ff9800"; };
+
+      let header = document.createElement("h2");
+      header.innerText = "📹 Your YouTube Channel";
+      header.style = "margin-bottom: 10px; text-shadow: 2px 2px 4px #000;";
+
+      let statsDisplay = document.createElement("div");
+      statsDisplay.innerHTML = `
+        <p><strong>Subscribers:</strong> ${player.subscribers.toLocaleString()}</p>
+        <p><strong>Total Views:</strong> ${player.totalViews.toLocaleString()}</p>
+        <p><strong>YouTube Earnings:</strong> $${player.youtubeEarnings.toLocaleString()}</p>
+      `;
+      statsDisplay.style = "margin: 10px 0; font-size: 14px; color: #FFD700; text-align: left;";
+
+      youtubePanel.appendChild(header);
+      youtubePanel.appendChild(statsDisplay);
+      youtubePanel.appendChild(videoList);
+      youtubePanel.appendChild(closeButton);
+      document.body.appendChild(youtubePanel);
+    }
+
+    function returnToGame() {
+      document.getElementById("youtubeChannel").style.display = "none";
+      document.getElementById("game").style.display = "block";
+    }
+
+    function postToYouTube(movieIndex) {
+  const movie = player.movies[movieIndex];
+  if (!player.youtubeVideos.some(v => v.title === movie.title)) {
+    if (!movie.released) {
+      alert("This movie is not yet released!");
+      return;
+    }
+    const isSeries = movie.type === "season" || movie.type === "mini-series";
+    const durationMultiplier = movie.duration / (movie.type === "short" ? 30 : movie.type === "feature" ? 90 : 45);
+    const adjustedMultiplier = durationMultiplier > 2 ? 2 + (durationMultiplier - 2) * 0.5 : durationMultiplier;
+    const initialViews = Math.floor(movie.budget * 150 * adjustedMultiplier + player.fame * 15 + Math.random() * 1000);
+    const initialLikes = Math.floor(initialViews * 0.03);
+    const initialComments = Math.floor(initialViews * 0.01);
+    const initialShares = Math.floor(initialViews * 0.002);
+    const newSubscribers = Math.floor(initialViews * 0.03 + player.fame * 0.05);
+    const earnings = Math.floor(initialViews / 1000 * 5);
+    const highProfileTalents = movie.talents.filter(t => t.price >= 400).length;
+    const viralChance = Math.min(0.6, 0.1 + (movie.budget / 100) * 0.05 + player.fame * 0.03 + highProfileTalents * 0.06);
+    const isViral = Math.random() < viralChance;
+
+    const budgetMultiplier = movie.budget === 1000 ? 1 : movie.budget === 2500 ? 1.5 : movie.budget === 5000 ? 2 : movie.budget === 7500 ? 2.5 : 3;
+    const episodeMultiplier = isSeries ? 1 : movie.episodeCount;
+    let talentMultiplier = 1;
+    const highCostTalents = movie.talents.filter(t => t.price >= 20000);
+    if (highCostTalents.length > 0) {
+      const highestPrice = Math.max(...highCostTalents.map(t => t.price));
+      if (highestPrice >= 100001) {
+        talentMultiplier = 4 + (highCostTalents.length - 1) * 0.5;
+      } else if (highestPrice >= 50001) {
+        talentMultiplier = 3 + (highCostTalents.length - 1) * 0.5;
+      } else {
+        talentMultiplier = 2 + (highCostTalents.length - 1) * 0.5;
+      }
+    }
+    const totalMultiplier = budgetMultiplier * episodeMultiplier * talentMultiplier * adjustedMultiplier;
+
+    player.subscribers += newSubscribers;
+    player.totalViews += initialViews;
+    player.youtubeEarnings += earnings;
+    player.money += earnings;
+
+    player.youtubeVideos.push({
+      title: movie.title,
+      genre: movie.genres.join(", "),
+      views: initialViews,
+      likes: initialLikes,
+      comments: initialComments,
+      shares: initialShares,
+      growthRate: isViral ? 0.15 : 0.05,
+      weeksSinceRelease: 0,
+      isViral: isViral,
+      thumbnail: getGenreThumbnail(movie.genres[0]),
+      isSeries: isSeries,
+      currentEpisode: isSeries ? 1 : movie.episodeCount,
+      totalEpisodes: movie.episodeCount,
+      weeksSinceLastEpisode: 0,
+      weeklyFans: Math.floor(movie.fansPerSec * totalMultiplier),
+      weeklyRevenue: Math.floor(movie.revenuePerSec * totalMultiplier)
+    });
+
+    generateReviews(video, "YouTube", true);
+    checkSubscriberMilestones();
+    renderYouTubeVideos();
+    document.getElementById("money").innerText = formatNumber("money", player.money);
+    alert(`${movie.title} Episode ${isSeries ? 1 : movie.episodeCount} has been posted to YouTube! Gained ${formatNumber("fans", newSubscribers)} subscribers and earned ${formatNumber("money", earnings)}.${isViral ? " It's gone viral!" : ""}${isSeries ? ` Only the first episode has been released.` : ""}${adjustedMultiplier !== 1 ? ` Duration impact: ${adjustedMultiplier.toFixed(2)}x fans and revenue!` : ""}`);
+    player.movies.splice(movieIndex, 1);
+    renderMoviesInPanel(document.getElementById("movieList") || document.createElement("div"));
+  } else {
+    alert(`${movie.title} is already posted on YouTube!`);
+  }
+}
+
+    function renderYouTubeVideos(container = null) {
+  if (!container) {
+    const youtubePanel = document.getElementById("youtubeVideoList");
+    if (youtubePanel) {
+      container = youtubePanel;
+    } else {
+      return;
+    }
+  }
+  container.innerHTML = "";
+  player.youtubeVideos.forEach((video, index) => {
+    let div = document.createElement("div");
+    div.className = "youtube-video";
+    div.innerHTML = `
+      <div class="video-header">
+        <span style="font-size: 40px; margin-right: 10px;">${video.thumbnail}</span>
+        <strong>🎬 ${video.title}${video.isViral ? " 🔥" : ""}</strong>
+      </div>
+      <p><strong>Genre:</strong> ${video.genre}</p>
+      <p><strong>Views:</strong> ${formatNumber("fans", video.views)}</p>
+      <p><strong>Likes:</strong> ${formatNumber("fans", video.likes)}</p>
+      <p><strong>Comments:</strong> ${formatNumber("fans", video.comments)}</p>
+      <p><strong>Shares:</strong> ${formatNumber("fans", video.shares)}</p>
+      ${video.isSeries ? `<p><strong>Episode Released:</strong> ${video.currentEpisode}/${video.totalEpisodes}</p>` : ""}
+      ${video.isSeries ? `<p><strong>Weeks Since Last Episode:</strong> ${video.weeksSinceLastEpisode}</p>` : ""}
+      ${video.isSeries && video.currentEpisode < video.totalEpisodes && video.weeksSinceLastEpisode >= 2
+        ? `<button onclick="releaseNextYouTubeEpisode(${index})">Release Episode ${video.currentEpisode + 1}</button>`
+        : ""}
+    `;
+    container.appendChild(div);
+  });
+}
+
+function releaseNextYouTubeEpisode(videoIndex) {
+  const video = player.youtubeVideos[videoIndex];
+  if (video.currentEpisode >= video.totalEpisodes) {
+    alert("All episodes have been released!");
+    return;
+  }
+
+  const movie = [...player.movies, ...player.streamingMovies].find(m => m.title === video.title) || video;
+  const durationMultiplier = movie.duration / (movie.type === "short" ? 30 : movie.type === "feature" ? 90 : 45);
+  const adjustedMultiplier = durationMultiplier > 2 ? 2 + (durationMultiplier - 2) * 0.5 : durationMultiplier;
+
+  video.currentEpisode += 1;
+  video.weeksSinceLastEpisode = 0;
+
+generateReviews(video, "YouTube", true);
+  const initialViews = Math.floor(video.weeklyFans * 150 * adjustedMultiplier + player.fame * 15 + Math.random() * 1000);
+  const initialLikes = Math.floor(initialViews * 0.03);
+  const initialComments = Math.floor(initialViews * 0.01);
+  const initialShares = Math.floor(initialViews * 0.002);
+  const newSubscribers = Math.floor(initialViews * 0.03 + player.fame * 0.05);
+  const earnings = Math.floor(initialViews / 1000 * 5);
+
+  video.views += initialViews;
+  video.likes += initialLikes;
+  video.comments += initialComments;
+  video.shares += initialShares;
+  player.subscribers += newSubscribers;
+  player.totalViews += initialViews;
+  player.youtubeEarnings += earnings;
+  player.money += earnings;
+  player.fans += video.weeklyFans;
+  player.fame += Math.floor(video.weeklyFans / 1000);
+
+  checkSubscriberMilestones();
+  document.getElementById("money").innerText = formatNumber("money", player.money);
+  document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+  document.getElementById("fans").innerText = formatNumber("fans", player.fans);
+  alert(`🎬 ${video.title} Episode ${video.currentEpisode} has been released on YouTube! Gained ${formatNumber("fans", newSubscribers)} subscribers, ${formatNumber("fans", video.weeklyFans)} fans, and earned ${formatNumber("money", earnings)}.${adjustedMultiplier !== 1 ? ` Duration impact: ${adjustedMultiplier.toFixed(2)}x fans and revenue!` : ""}`);
+  renderYouTubeVideos();
+}
+
+    function startPromotionCampaign() {
+    document.getElementById("game").style.display = "none";
+    document.getElementById("promotionCampaign").style.display = "block";
+    updatePromotionTargetDropdown();
+    document.getElementById("campaignType").value = "";
+    updateCampaignDetails();
+}
+
+function updatePromotionTargetDropdown() {
+    const targetSelect = document.getElementById("promotionTarget");
+    targetSelect.innerHTML = '<option value="company">Promote Company</option>';
+
+    // Filter movies to exclude those with expired campaigns
+    const expiredCampaignTargets = player.activeCampaigns
+        .filter(campaign => campaign.weeksRemaining <= 0)
+        .map(campaign => campaign.target);
+
+    player.movies.forEach((movie, index) => {
+        if (!expiredCampaignTargets.includes(index.toString())) {
+            const option = document.createElement("option");
+            option.value = index;
+            option.innerText = `Promote ${movie.title} (${movie.type}${movie.released ? ", Released" : ", In Production"})`;
+            targetSelect.appendChild(option);
+        }
+    });
+    player.streamingMovies.forEach((movie, index) => {
+        if (!expiredCampaignTargets.includes(`s_${index}`)) {
+            const option = document.createElement("option");
+            option.value = `s_${index}`;
+            option.innerText = `Promote ${movie.title} (${movie.type}, Released on ${movie.platform})`;
+            targetSelect.appendChild(option);
+        }
+    });
+}
+
+function formatNumber(type, value) {
+  if (type === "money") {
+    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `$${(value / 1000).toFixed(1)}K`;
+    return `$${value}`;
+  } else if (type === "fans") {
+    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
+    return `${value}`;
+  } else if (type === "fame") {
+    if (value === 0) return "0";
+    return `${(value / 1000).toFixed(3)}/100`; // e.g., 25  0.025/100
+  }
+  return value;
+}
+
+    function updateCampaignDetails() {
+  const campaignType = document.getElementById("campaignType").value;
+  const details = document.getElementById("campaignDetails");
+  const campaigns = {
+    socialMedia: { cost: 5000, fame: 25, fans: 25000, movieBoost: 3.0, residualFame: 2.5, residualFans: 2500, releaseFameBoost: 10 },
+    tvAd: { cost: 15000, fame: 75, fans: 75000, movieBoost: 4.0, residualFame: 7.5, residualFans: 7500, releaseFameBoost: 30 },
+    billboard: { cost: 10000, fame: 50, fans: 50000, movieBoost: 3.4, residualFame: 5, residualFans: 5000, releaseFameBoost: 20 },
+    influencer: { cost: 7500, fame: 37.5, fans: 37500, movieBoost: 3.2, residualFame: 3.75, residualFans: 3750, releaseFameBoost: 15 },
+    pressRelease: { cost: 4000, fame: 20, fans: 20000, movieBoost: 2.8, residualFame: 2, residualFans: 2000, releaseFameBoost: 8 },
+    viralVideo: { cost: 8000, fame: 40, fans: 40000, movieBoost: 3.3, residualFame: 4, residualFans: 4000, releaseFameBoost: 16 },
+    celebrityEndorsement: { cost: 20000, fame: 100, fans: 100000, movieBoost: 4.4, residualFame: 10, residualFans: 10000, releaseFameBoost: 40 },
+    festivalScreening: { cost: 12000, fame: 60, fans: 60000, movieBoost: 3.6, residualFame: 6, residualFans: 6000, releaseFameBoost: 24 },
+    onlineStreamingEvent: { cost: 9000, fame: 45, fans: 45000, movieBoost: 3.4, residualFame: 4.5, residualFans: 4500, releaseFameBoost: 18 },
+    globalTour: { cost: 25000, fame: 125, fans: 125000, movieBoost: 5.0, residualFame: 12.5, residualFans: 12500, releaseFameBoost: 50 }
+  };
+  if (campaignType && campaigns[campaignType]) {
+    const { cost, fame, fans, movieBoost } = campaigns[campaignType];
+    details.innerHTML = `
+      <strong>Cost:</strong> ${formatNumber("money", cost)}<br>
+      <strong>Fame Gain:</strong> +${formatNumber("fame", fame)}<br>
+      <strong>Fan Gain:</strong> +${formatNumber("fans", fans)}<br>
+      ${document.getElementById("promotionTarget").value !== "company" ? `<strong>Movie Boost:</strong> ${movieBoost}x to Fans/Revenue per Sec` : ""}
+    `;
+  } else {
+    details.innerText = "Select a campaign type to see details.";
+  }
+}
+
+function launchPromotion() {
+    const campaignType = document.getElementById("campaignType").value;
+    const target = document.getElementById("promotionTarget").value;
+    const campaigns = {
+        socialMedia: { cost: 5000, fame: 25, fans: 25000, movieBoost: 3.0, revenueBoost: 2.0, residualFame: 2.5, residualFans: 2500, releaseFameBoost: 10 },
+        tvAd: { cost: 15000, fame: 75, fans: 75000, movieBoost: 4.0, revenueBoost: 2.5, residualFame: 7.5, residualFans: 7500, releaseFameBoost: 30 },
+        billboard: { cost: 10000, fame: 50, fans: 50000, movieBoost: 3.4, revenueBoost: 2.2, residualFame: 5, residualFans: 5000, releaseFameBoost: 20 },
+        influencer: { cost: 7500, fame: 37.5, fans: 37500, movieBoost: 3.2, revenueBoost: 2.1, residualFame: 3.75, residualFans: 3750, releaseFameBoost: 15 },
+        pressRelease: { cost: 4000, fame: 20, fans: 20000, movieBoost: 2.8, revenueBoost: 1.8, residualFame: 2, residualFans: 2000, releaseFameBoost: 8 },
+        viralVideo: { cost: 8000, fame: 40, fans: 40000, movieBoost: 3.3, revenueBoost: 2.3, residualFame: 4, residualFans: 4000, releaseFameBoost: 16 },
+        celebrityEndorsement: { cost: 20000, fame: 100, fans: 100000, movieBoost: 4.4, revenueBoost: 2.8, residualFame: 10, residualFans: 10000, releaseFameBoost: 40 },
+        festivalScreening: { cost: 12000, fame: 60, fans: 60000, movieBoost: 3.6, revenueBoost: 2.4, residualFame: 6, residualFans: 6000, releaseFameBoost: 24 },
+        onlineStreamingEvent: { cost: 9000, fame: 45, fans: 45000, movieBoost: 3.4, revenueBoost: 2.2, residualFame: 4.5, residualFans: 4500, releaseFameBoost: 18 },
+        globalTour: { cost: 25000, fame: 125, fans: 125000, movieBoost: 5.0, revenueBoost: 3.0, residualFame: 12.5, residualFans: 12500, releaseFameBoost: 50 },
+    };
+
+    if (!campaignType) {
+        alert("Please select a campaign type!");
+        return;
+    }
+
+    const campaign = campaigns[campaignType];
+    if (player.money < campaign.cost) {
+        alert(`Not enough money! Need ${formatNumber("money", campaign.cost)}.`);
+        return;
+    }
+
+    player.money -= campaign.cost;
+    const duration = Math.floor(Math.random() * 3) + 3;
+
+    let movie, movieIndex, isStreamingMovie = false;
+    if (target !== "company") {
+        if (target.startsWith("s_")) {
+            movieIndex = parseInt(target.split("_")[1]);
+            movie = player.streamingMovies[movieIndex];
+            isStreamingMovie = true;
+        } else {
+            movieIndex = parseInt(target);
+            movie = player.movies[movieIndex];
+        }
+    }
+
+    // Store original revenue for restoration after campaign ends
+    let originalRevenue = 0;
+    if (target !== "company" && movie.released) {
+        originalRevenue = isStreamingMovie || movie.platform ? movie.weeklyRevenue : movie.revenuePerSec;
+    }
+
+    player.activeCampaigns.push({
+        type: campaignType,
+        target: target,
+        weeksRemaining: duration,
+        fame: campaign.fame,
+        fans: campaign.fans,
+        movieBoost: campaign.movieBoost,
+        revenueBoost: campaign.revenueBoost,
+        residualFame: campaign.residualFame,
+        residualFans: campaign.residualFans,
+        releaseFameBoost: target !== "company" && !movie.released ? campaign.releaseFameBoost : 0,
+        originalRevenue: originalRevenue
+    });
+
+    if (target !== "company" && movie.released) {
+        if (isStreamingMovie || movie.platform) {
+            movie.weeklyFans = Math.floor(movie.weeklyFans * campaign.movieBoost);
+            movie.weeklyRevenue = Math.floor(movie.weeklyRevenue * campaign.revenueBoost);
+        } else {
+            movie.fansPerSec = Math.floor(movie.fansPerSec * campaign.movieBoost);
+            movie.revenuePerSec = Math.floor(movie.revenuePerSec * campaign.revenueBoost);
+        }
+        alert(
+            `📢 ${campaignType.replace(/([A-Z])/g, " $1").trim()} campaign launched for ${movie.title}! Campaign will run for ${duration} weeks, boosting ${
+                isStreamingMovie || movie.platform ? "streaming fans" : "fan growth"
+            } by ${campaign.movieBoost}x and revenue by ${campaign.revenueBoost}x, gaining ${formatNumber("fame", campaign.fame)} fame and ${formatNumber("fans", campaign.fans)} fans weekly.`
+        );
+    } else if (target !== "company") {
+        alert(
+            `📢 ${campaignType.replace(/([A-Z])/g, " $1").trim()} campaign launched for ${movie.title}! Campaign will run for ${duration} weeks, gaining ${formatNumber(
+                "fame",
+                campaign.fame
+            )} fame and ${formatNumber("fans", campaign.fans)} fans weekly, with a ${formatNumber("fame", campaign.releaseFameBoost)} fame boost at release.`
+        );
+    } else {
+        alert(
+            `📢 ${campaignType.replace(/([A-Z])/g, " $1").trim()} campaign launched for your company! Campaign will run for ${duration} weeks, gaining ${formatNumber(
+                "fame",
+                campaign.fame
+            )} fame and ${formatNumber("fans", campaign.fans)} fans weekly.`
+        );
+    }
+
+    document.getElementById("money").innerText = formatNumber("money", player.money);
+    document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+    document.getElementById("fans").innerText = formatNumber("fans", player.fans);
+    closePromotionCampaign();
+}
+
+    function closePromotionCampaign() {
+      document.getElementById("promotionCampaign").style.display = "none";
+      document.getElementById("game").style.display = "block";
+    }
+
+function closeStreamingPlatform() {
+      document.getElementById("streamingPlatform").style.display = "none";
+      document.getElementById("game").style.display = "block";
+    }
+
+function launchStreamingPlatform() {
+  document.getElementById("game").style.display = "none";
+  document.getElementById("streamingPlatform").style.display = "block";
+  renderStreamingPlatforms();
+}
+
+    function renderStreamingPlatforms() {
+      const platforms = [
+  { name: "IndieFlicks", fameRequired: 0, cost: 100, weeklyRevenue: 10, weeklyFans: 50, fameBoost: 10, description: "A niche platform for independent films." },
+  { name: "Hula", fameRequired: 1000, cost: 300, weeklyRevenue: 20, weeklyFans: 100, fameBoost: 25, description: "A growing platform with a broad audience." },
+  { name: "PrimeView", fameRequired: 2000, cost: 500, weeklyRevenue: 30, weeklyFans: 150, fameBoost: 50, description: "A major platform with global reach." },
+  { name: "DisStream", fameRequired: 4000, cost: 800, weeklyRevenue: 40, weeklyFans: 200, fameBoost: 75, description: "A premium platform for family content." },
+  { name: "AppleStream", fameRequired: 6000, cost: 1000, weeklyRevenue: 50, weeklyFans: 250, fameBoost: 100, description: "A high-end platform for prestige films." },
+  { name: "StreamFlix", fameRequired: 10000, cost: 1500, weeklyRevenue: 75, weeklyFans: 400, fameBoost: 150, description: "The dominant streaming service." },
+  { name: "VibeStream", fameRequired: 1400, cost: 400, weeklyRevenue: 25, weeklyFans: 120, fameBoost: 30, description: "A trendy platform for young audiences." },
+  { name: "GlobeFlix", fameRequired: 3000, cost: 600, weeklyRevenue: 35, weeklyFans: 180, fameBoost: 60, description: "A global platform with diverse content." },
+  { name: "StarCast", fameRequired: 5000, cost: 900, weeklyRevenue: 45, weeklyFans: 220, fameBoost: 85, description: "A platform focused on star-driven blockbusters." },
+  { name: "EpicView", fameRequired: 8000, cost: 1200, weeklyRevenue: 60, weeklyFans: 300, fameBoost: 120, description: "A premium service for epic storytelling." },
+  { name: "NexGenTV", fameRequired: 12000, cost: 1800, weeklyRevenue: 90, weeklyFans: 500, fameBoost: 200, description: "A cutting-edge platform for innovative content." },
+];
+
+      const platformSelect = document.getElementById("platformSelect");
+      platformSelect.innerHTML = '<option value="">Select Platform</option>';
+      platforms.forEach(platform => {
+        if (player.fame >= platform.fameRequired) {
+          const option = document.createElement("option");
+          option.value = JSON.stringify(platform);
+          option.innerText = `${platform.name} (Fame: ${platform.fameRequired}, Cost: $${platform.cost})`;
+          platformSelect.appendChild(option);
+        }
+      });
+
+      const movieSelect = document.getElementById("movieSelect");
+      movieSelect.innerHTML = '<option value="">Select Movie</option>';
+      player.movies.forEach((movie, index) => {
+        if (!movie.released && checkReleaseConditions(movie)) {
+          const option = document.createElement("option");
+          option.value = index;
+          option.innerText = `${movie.title} (${movie.type})`;
+          movieSelect.appendChild(option);
+        }
+      });
+
+      const details = document.getElementById("platformDetails");
+      platformSelect.onchange = function() {
+        const selectedPlatform = this.value ? JSON.parse(this.value) : null;
+        if (selectedPlatform) {
+          details.innerHTML = `
+            <strong>Platform:</strong> ${selectedPlatform.name}<br>
+            <strong>Description:</strong> ${selectedPlatform.description}<br>
+            <strong>Fame Required:</strong> ${selectedPlatform.fameRequired}<br>
+            <strong>Release Cost:</strong> $${selectedPlatform.cost}<br>
+            <strong>Weekly Revenue:</strong> $${selectedPlatform.weeklyRevenue} � budget multiplier<br>
+            <strong>Weekly Fans:</strong> ${selectedPlatform.weeklyFans} � budget multiplier<br>
+            <strong>Fame Boost:</strong> +${selectedPlatform.fameBoost}
+          `;
+        } else {
+          details.innerText = "Select a platform to see details.";
+        }
+      };
+      details.innerText = "Select a platform to see details.";
+    }
+
+    function launchStreamingRelease() {
+  const platformSelect = document.getElementById("platformSelect").value;
+  const movieIndex = document.getElementById("movieSelect").value;
+  if (!platformSelect || movieIndex === "") {
+    alert("Please select a platform and a movie!");
+    return;
+  }
+
+  const platform = JSON.parse(platformSelect);
+  const movie = player.movies[parseInt(movieIndex)];
+
+  // Confirmation prompt
+  if (!confirm(`Are you sure you want to release "${movie.title}" on ${platform.name} for $${formatNumber("money", platform.cost)}?`)) {
+    return;
+  }
+
+  if (player.money < platform.cost) {
+    alert(`Not enough money! Need $${formatNumber("money", platform.cost)}.`);
+    return;
+  }
+
+  const budgetMultiplier = movie.budget === 1000 ? 1 : movie.budget === 2500 ? 1.5 : movie.budget === 5000 ? 2 : movie.budget === 7500 ? 2.5 : 3;
+  const episodeMultiplier = (movie.type === "season" || movie.type === "mini-series") ? movie.episodeCount : 1;
+  let talentMultiplier = 1;
+  const highCostTalents = movie.talents.filter(t => t.price >= 20000);
+  if (highCostTalents.length > 0) {
+    const highestPrice = Math.max(...highCostTalents.map(t => t.price));
+    if (highestPrice >= 100001) {
+      talentMultiplier = 4 + (highCostTalents.length - 1) * 0.5;
+    } else if (highestPrice >= 50001) {
+      talentMultiplier = 3 + (highCostTalents.length - 1) * 0.5;
+    } else {
+      talentMultiplier = 2 + (highCostTalents.length - 1) * 0.5;
+    }
+  }
+  const durationMultiplier = movie.duration / (movie.type === "short" ? 30 : movie.type === "feature" ? 90 : 45);
+  const adjustedMultiplier = durationMultiplier > 2 ? 2 + (durationMultiplier - 2) * 0.5 : durationMultiplier;
+  const totalMultiplier = budgetMultiplier * episodeMultiplier * talentMultiplier * adjustedMultiplier;
+
+  // Adjusted earnings for realism and better rewards
+  const baseRevenue = platform.weeklyRevenue * 100;
+  const revenueBoost = movie.budget * 0.5 + highCostTalents.length * 1000;
+  const weeklyRevenue = Math.floor(baseRevenue * totalMultiplier + revenueBoost);
+  const weeklyFans = Math.floor(platform.weeklyFans * totalMultiplier * 1.5);
+  const fameBoost = Math.floor(platform.fameBoost * 1.5);
+
+  player.money -= platform.cost;
+  player.fame += fameBoost;
+  player.fans += weeklyFans;
+
+  movie.released = true;
+  movie.platform = platform.name;
+  movie.weeklyRevenue = weeklyRevenue;
+  movie.weeklyFans = weeklyFans;
+  movie.weeksSinceRelease = 0;
+  movie.currentEpisode = (movie.type === "season" || movie.type === "mini-series") ? 1 : movie.episodeCount;
+  movie.weeksSinceLastEpisode = 0;
+
+  player.streamingMovies.push(movie);
+  player.movies.splice(parseInt(movieIndex), 1);
+  
+  generateReviews(movie, platform.name);
+  document.getElementById("money").innerText = formatNumber("money", player.money);
+  document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+  document.getElementById("fans").innerText = formatNumber("fans", player.fans);
+  alert(
+    `🎬 ${movie.title} Episode ${movie.currentEpisode} has been released on ${platform.name}! Paid $${formatNumber(
+      "money",
+      platform.cost
+    )}, gained ${formatNumber("fame", fameBoost)} fame, ${formatNumber(
+      "fans",
+      weeklyFans
+    )} fans, and will earn $${formatNumber("money", weeklyRevenue)} weekly.${talentMultiplier > 1 ? ` High-profile talent boost: ${talentMultiplier}x fans and revenue!` : ""}${adjustedMultiplier !== 1 ? ` Duration impact: ${adjustedMultiplier.toFixed(2)}x fans and revenue!` : ""}`
+  );
+  closeStreamingPlatform();
+  renderMoviesInPanel(document.getElementById("movieList") || document.createElement("div"));
+  renderStreamingMovies(document.getElementById("streamingMoviesList") || document.createElement("div"));
+}
+    
+    function releaseNextEpisode(movieIndex) {
+  const movie = player.streamingMovies[movieIndex];
+  if (movie.currentEpisode >= movie.episodeCount) {
+    alert("All episodes have been released!");
+    return;
+  }
+
+  movie.currentEpisode += 1;
+  movie.weeksSinceLastEpisode = 0;
+
+generateReviews(movie, movie.platform);
+  const budgetMultiplier = movie.budget === 1000 ? 1 : movie.budget === 2500 ? 1.5 : movie.budget === 5000 ? 2 : movie.budget === 7500 ? 2.5 : 3;
+  let talentMultiplier = 1;
+  const highCostTalents = movie.talents.filter(t => t.price >= 20000);
+  if (highCostTalents.length > 0) {
+    const highestPrice = Math.max(...highCostTalents.map(t => t.price));
+    if (highestPrice >= 100001) {
+      talentMultiplier = 4 + (highCostTalents.length - 1) * 0.5;
+    } else if (highestPrice >= 50001) {
+      talentMultiplier = 3 + (highCostTalents.length - 1) * 0.5;
+    } else {
+      talentMultiplier = 2 + (highCostTalents.length - 1) * 0.5;
+    }
+  }
+  const durationMultiplier = movie.duration / (movie.type === "short" ? 30 : movie.type === "feature" ? 90 : 45);
+  const adjustedMultiplier = durationMultiplier > 2 ? 2 + (durationMultiplier - 2) * 0.5 : durationMultiplier;
+  const totalMultiplier = budgetMultiplier * talentMultiplier * adjustedMultiplier;
+
+  const platforms = [
+  { name: "IndieFlicks", fameRequired: 0, cost: 100, weeklyRevenue: 10, weeklyFans: 50, fameBoost: 10, description: "A niche platform for independent films." },
+  { name: "Hula", fameRequired: 1000, cost: 300, weeklyRevenue: 20, weeklyFans: 100, fameBoost: 25, description: "A growing platform with a broad audience." },
+  { name: "PrimeView", fameRequired: 2000, cost: 500, weeklyRevenue: 30, weeklyFans: 150, fameBoost: 50, description: "A major platform with global reach." },
+  { name: "DisStream", fameRequired: 4000, cost: 800, weeklyRevenue: 40, weeklyFans: 200, fameBoost: 75, description: "A premium platform for family content." },
+  { name: "AppleStream", fameRequired: 6000, cost: 1000, weeklyRevenue: 50, weeklyFans: 250, fameBoost: 100, description: "A high-end platform for prestige films." },
+  { name: "StreamFlix", fameRequired: 10000, cost: 1500, weeklyRevenue: 75, weeklyFans: 400, fameBoost: 150, description: "The dominant streaming service." },
+  { name: "VibeStream", fameRequired: 1400, cost: 400, weeklyRevenue: 25, weeklyFans: 120, fameBoost: 30, description: "A trendy platform for young audiences." },
+  { name: "GlobeFlix", fameRequired: 3000, cost: 600, weeklyRevenue: 35, weeklyFans: 180, fameBoost: 60, description: "A global platform with diverse content." },
+  { name: "StarCast", fameRequired: 5000, cost: 900, weeklyRevenue: 45, weeklyFans: 220, fameBoost: 85, description: "A platform focused on star-driven blockbusters." },
+  { name: "EpicView", fameRequired: 8000, cost: 1200, weeklyRevenue: 60, weeklyFans: 300, fameBoost: 120, description: "A premium service for epic storytelling." },
+  { name: "NexGenTV", fameRequired: 12000, cost: 1800, weeklyRevenue: 90, weeklyFans: 500, fameBoost: 200, description: "A cutting-edge platform for innovative content." },
+];
+  const platform = platforms.find((p) => p.name === movie.platform);
+  movie.weeklyFans = Math.floor(platform.weeklyFans * totalMultiplier);
+  movie.weeklyRevenue = Math.floor(platform.weeklyRevenue * totalMultiplier);
+
+  player.fans += movie.weeklyFans;
+  player.fame += Math.floor(platform.fameBoost * 0.5);
+
+  document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+  document.getElementById("fans").innerText = formatNumber("fans", player.fans);
+  alert(`🎬 ${movie.title} Episode ${movie.currentEpisode} has been released on ${movie.platform}! Gained ${formatNumber("fans", movie.weeklyFans)} fans and ${formatNumber("fame", Math.floor(platform.fameBoost * 0.5))} fame.${adjustedMultiplier !== 1 ? ` Duration impact: ${adjustedMultiplier.toFixed(2)}x fans and revenue!` : ""}`);
+  renderStreamingMovies(document.getElementById("streamingMoviesList") || document.createElement("div"));
+}
+
+    function hireTalent() {
+      document.getElementById("game").style.display = "none";
+      document.getElementById("hireTalent").style.display = "block";
+      renderTalentsByCategory();
+    }
+
+    function closeHireTalent() {
+      document.getElementById("hireTalent").style.display = "none";
+      document.getElementById("game").style.display = "block";
+    }
+
+    function renderTalentsByCategory() {
+  const category = document.getElementById("talentCategory").value;
+  const allTalents = {
+    directors: [
+      { name: "Steven Spielberg", price: 500 },
+      { name: "Quentin Tarantino", price: 450 },
+      { name: "Christopher Nolan", price: 600 },
+      { name: "Martin Scorsese", price: 550 },
+      { name: "Ridley Scott", price: 400 },
+      { name: "David Fincher", price: 480 },
+      { name: "Kathryn Bigelow", price: 420 },
+      { name: "James Cameron", price: 700 },
+      { name: "Denis Villeneuve", price: 460 },
+      { name: "Guillermo del Toro", price: 430 },
+      { name: "Ang Lee", price: 410 },
+      { name: "Ava DuVernay", price: 470 },
+      { name: "Greta Gerwig", price: 440 },
+      { name: "Bong Joon-ho", price: 490 },
+      { name: "Alfonso Cuar�n", price: 510 },
+      { name: "Lila Chen", price: 200 },
+      { name: "Amir Hossein", price: 180 },
+      { name: "Sofia Marquez", price: 220 },
+      { name: "Jaden Park", price: 190 },
+      // New high-cost directors
+      { name: "Isabella Cortez", price: 20000 },
+      { name: "Marcus Velluto", price: 50000 },
+      { name: "Elena Kwan", price: 100000 },
+      { name: "Viktor Stahl", price: 200000 }
+    ],
+    actors: [
+      { name: "Tom Hanks", price: 300 },
+      { name: "Emma Stone", price: 250 },
+      { name: "Robert De Niro", price: 350 },
+      { name: "Scarlett Johansson", price: 280 },
+      { name: "Brad Pitt", price: 320 },
+      { name: "Natalie Portman", price: 270 },
+      { name: "Leonardo DiCaprio", price: 400 },
+      { name: "Meryl Streep", price: 310 },
+      { name: "Ryan Gosling", price: 290 },
+      { name: "Anne Hathaway", price: 260 },
+      { name: "Denzel Washington", price: 340 },
+      { name: "Jennifer Lawrence", price: 300 },
+      { name: "Zendaya", price: 330 },
+      { name: "Timoth�e Chalamet", price: 310 },
+      { name: "Viola Davis", price: 360 },
+      { name: "Chris Hemsworth", price: 340 },
+      { name: "Maya Torres", price: 150 },
+      { name: "Liam Chen", price: 140 },
+      { name: "Aisha Khan", price: 160 },
+      { name: "Elliot Brooks", price: 130 },
+      // New high-cost actors
+      { name: "Sophia Blake", price: 20000 },
+      { name: "Ethan Caldwell", price: 50000 },
+      { name: "Aria Nguyen", price: 100000 },
+      { name: "Julian Rex", price: 200000 }
+    ],
+    composers: [
+      { name: "Hans Zimmer", price: 350 },
+      { name: "John Williams", price: 400 },
+      { name: "Ennio Morricone", price: 300 },
+      { name: "Danny Elfman", price: 320 },
+      { name: "Alexandre Desplat", price: 340 },
+      { name: "Ludovico Einaudi", price: 310 },
+      { name: "Nia Foster", price: 170 },
+      { name: "Ravi Patel", price: 150 },
+      // New high-cost composers
+      { name: "Liam Voss", price: 20000 },
+      { name: "Clara Moreno", price: 50000 },
+      { name: "Adrian Holt", price: 100000 },
+      { name: "Sylvia Dawn", price: 150000 }
+    ],
+    cinematographers: [
+      { name: "Roger Deakins", price: 380 },
+      { name: "Emmanuel Lubezki", price: 360 },
+      { name: "Robert Richardson", price: 340 },
+      { name: "Hoyte van Hoytema", price: 370 },
+      { name: "Greig Fraser", price: 350 },
+      { name: "Elena Voss", price: 180 },
+      { name: "Kai Nakamura", price: 160 },
+      // New high-cost cinematographers
+      { name: "Nora Fielding", price: 20000 },
+      { name: "Ezra Kline", price: 50000 },
+      { name: "Mateo Silva", price: 100000 },
+      { name: "Olivia Grant", price: 150000 }
+    ],
+    others: [
+      { name: "Costume Designer (Sandy Powell)", price: 200 },
+      { name: "Production Designer (Dante Ferretti)", price: 250 },
+      { name: "Editor (Thelma Schoonmaker)", price: 230 },
+      { name: "VFX Supervisor (Joe Letteri)", price: 270 },
+      { name: "Sound Designer (Ben Burtt)", price: 260 },
+      { name: "Costume Designer (Maria Gomez)", price: 120 },
+      { name: "Editor (Sam Lee)", price: 100 },
+      // New high-cost others
+      { name: "VFX Supervisor (Zara Lin)", price: 20000 },
+      { name: "Production Designer (Theo Ramsey)", price: 50000 },
+      { name: "Editor (Lena Harper)", price: 100000 },
+      { name: "Sound Designer (Maxine Cole)", price: 150000 }
+    ]
+  };
+  let talents = allTalents[category] || [];
+  let container = document.getElementById("talentList");
+  container.innerHTML = "";
+  
+  const assignedTalents = player.movies.flatMap(m => m.talents.map(t => t.name));
+
+  talents.forEach(talent => {
+    let div = document.createElement("div");
+    div.className = "talent";
+    let isSelected = assignedTalents.includes(talent.name);
+    let assignedMovie = player.movies.find(m => m.talents.some(t => t.name === talent.name));
+    let movieSelect = document.createElement("select");
+    movieSelect.style = "margin-top: 5px; padding: 5px; width: 100%; border-radius: 8px; border: none;";
+    let defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.innerText = "Select Movie";
+    movieSelect.appendChild(defaultOption);
+    player.movies.filter(m => !m.released).forEach((m, idx) => {
+      let option = document.createElement("option");
+      option.value = idx;
+      option.innerText = m.title;
+      if (assignedMovie && assignedMovie.title === m.title) option.selected = true;
+      movieSelect.appendChild(option);
+    });
+
+    div.innerHTML = `${talent.name} - ${formatNumber("money", talent.price)} ${isSelected ? "(Already Selected for: " + (assignedMovie ? assignedMovie.title : "Unknown") + ")" : ""}<br>`;
+    let hireButton = document.createElement("button");
+    hireButton.innerText = isSelected ? "Already Hired" : "Hire";
+    hireButton.onclick = function() {
+      if (!isSelected && player.money >= talent.price) {
+        let movieIndex = movieSelect.value;
+        if (movieIndex !== "") {
+          player.money -= talent.price;
+          player.talents.push({ name: talent.name, price: talent.price, movieIndex: parseInt(movieIndex) });
+          player.movies[parseInt(movieIndex)].talents.push({ name: talent.name, price: talent.price });
+          renderTalentsByCategory();
+          alert(`${talent.name} has been hired for ${player.movies[parseInt(movieIndex)].title}!`);
+        } else {
+          alert("Please select a movie to assign this talent!");
+        }
+      } else if (isSelected) {
+        alert(`${talent.name} is already hired for ${assignedMovie ? assignedMovie.title : "a movie"}!`);
+      } else {
+        alert(`Not enough money to hire this talent! Need ${formatNumber("money", talent.price)}.`);
+      }
+    };
+    hireButton.style = "margin-top: 5px; padding: 5px; width: 100%; border-radius: 8px; border: none; background: " + (isSelected ? "#757575" : "#ff9800") + "; color: white; font-weight: bold; cursor: pointer;";
+    hireButton.onmouseover = function() { if (!isSelected) this.style.background = "#e67e22"; };
+    hireButton.onmouseout = function() { if (!isSelected) this.style.background = "#ff9800"; };
+
+    div.appendChild(hireButton);
+    div.appendChild(movieSelect);
+    container.appendChild(div);
+  });
+}
+
+    function hireTalentByName(name, price) {
+      if (player.money >= price) {
+        player.money -= price;
+        player.talents.push({ name: name, price: price });
+        renderTalentsByCategory();
+        alert(`${name} has been hired!`);
+      } else {
+        alert("Not enough money to hire this talent!");
+      }
+    }
+
+    function nextWeek() {
+    const weeks = [
+        "January 1st", "January 8th", "January 15th", "January 22nd", "January 29th",
+        "February 5th", "February 12th", "February 19th", "February 26th",
+        "March 5th", "March 12th", "March 19th", "March 26th",
+        "April 2nd", "April 9th", "April 16th", "April 23rd", "April 30th",
+        "May 7th", "May 14th", "May 21st", "May 28th",
+        "June 4th", "June 11th", "June 18th", "June 25th",
+        "July 2nd", "July 9th", "July 16th", "July 23rd", "July 30th",
+        "August 6th", "August 13th", "August 20th", "August 27th",
+        "September 3rd", "September 10th", "September 17th", "September 24th",
+        "October 1st", "October 8th", "October 15th", "October 22nd", "October 29th",
+        "November 5th", "November 12th", "November 19th", "November 26th",
+        "December 3rd", "December 10th", "December 17th", "December 24th"
+    ];
+    let currentIndex = weeks.indexOf(player.week);
+    if (currentIndex < weeks.length - 1) {
+        player.week = weeks[currentIndex + 1];
+    } else {
+        player.week = weeks[0];
+        player.year = parseInt(player.year) + 1;
+    }
+
+    // Apply weekly earnings and fan growth
+    player.movies.forEach((m) => {
+        if (m.released) {
+            if (m.platform) {
+                player.fans += m.weeklyFans || 0;
+                player.money += m.weeklyRevenue || 0;
+            } else {
+                player.fans += m.fansPerSec || 0;
+                player.money += m.revenuePerSec || 0;
+            }
+        }
+    });
+
+    player.streamingMovies.forEach((movie) => {
+        if (movie.released) {
+            player.fans += movie.weeklyFans || 0;
+            player.money += movie.weeklyRevenue || 0;
+            movie.weeksSinceLastEpisode = (movie.weeksSinceLastEpisode || 0) + 1;
+            if (movie.weeksSinceRelease < 10) {
+                movie.weeksSinceRelease += 1;
+                const decayRate = 0.9;
+                const decayFactor = Math.pow(decayRate, movie.weeksSinceRelease);
+                movie.weeklyRevenue = Math.floor(movie.weeklyRevenue * decayFactor);
+                movie.weeklyFans = Math.floor(movie.weeklyFans * decayFactor);
+            }
+        }
+    });
+
+    player.youtubeVideos.forEach((video) => {
+        if (video.isSeries) {
+            video.weeksSinceLastEpisode = (video.weeksSinceLastEpisode || 0) + 1;
+            if (video.weeksSinceRelease < 10) {
+                video.weeksSinceRelease += 1;
+                const decayRate = 0.9;
+                const decayFactor = Math.pow(decayRate, video.weeksSinceRelease);
+                video.weeklyRevenue = Math.floor(video.weeklyRevenue * decayFactor);
+                video.weeklyFans = Math.floor(video.weeklyFans * decayFactor);
+            }
+            if (video.currentEpisode <= video.totalEpisodes) {
+                player.fans += video.weeklyFans || 0;
+                player.money += video.weeklyRevenue || 0;
+            }
+        }
+    });
+
+    // Update YouTube video metrics
+    let weeklyViews = 0;
+    player.youtubeVideos.forEach((video) => {
+        video.weeksSinceRelease += 1;
+        if ((video.isViral && video.weeksSinceRelease <= 20) || (!video.isViral && video.weeksSinceRelease <= 10)) {
+            const decayRate = video.isViral ? 0.95 : 0.9;
+            const growthFactor = Math.max(0.01, video.growthRate * Math.pow(decayRate, video.weeksSinceRelease));
+            const newViews = Math.floor(video.views * growthFactor * (1 + Math.random() * 0.2 - 0.1));
+            video.views += newViews;
+            video.likes = Math.floor(video.views * 0.03);
+            video.comments = Math.floor(video.views * 0.01);
+            video.shares = Math.floor(video.views * 0.002);
+            weeklyViews += newViews;
+        }
+    });
+    const weeklyEarnings = Math.floor(weeklyViews / 1000 * 5);
+    player.totalViews += weeklyViews;
+    player.youtubeEarnings += weeklyEarnings;
+    player.money += weeklyEarnings;
+    player.subscribers += Math.floor(weeklyViews * 0.03 + player.fame * 0.05);
+    player.fans += Math.floor(weeklyViews * 0.05);
+    player.fame += Math.floor(weeklyViews / 10000 + player.subscribers / 1000);
+
+    // Update active campaigns
+    const activeCampaigns = [];
+    player.activeCampaigns.forEach((campaign) => {
+        if (campaign.weeksRemaining > 0) {
+            player.fame += campaign.fame;
+            player.fans += campaign.fans;
+            campaign.weeksRemaining -= 1;
+            activeCampaigns.push(campaign);
+            if (campaign.weeksRemaining === 0) {
+                alert(
+                    `🎉 The ${campaign.type.replace(/([A-Z])/g, " $1").trim()} campaign for ${
+                        campaign.target === "company" ? "your company" : (player.movies[campaign.target]?.title || player.streamingMovies[campaign.target.split("_")[1]]?.title)
+                    } has ended. Residual effects will continue.`
+                );
+                // Restore original revenue for the movie
+                if (campaign.target !== "company") {
+                    let movie, isStreamingMovie = false;
+                    if (campaign.target.startsWith("s_")) {
+                        movie = player.streamingMovies[parseInt(campaign.target.split("_")[1])];
+                        isStreamingMovie = true;
+                    } else {
+                        movie = player.movies[parseInt(campaign.target)];
+                    }
+                    if (movie && movie.released) {
+                        if (isStreamingMovie || movie.platform) {
+                            movie.weeklyRevenue = campaign.originalRevenue;
+                        } else {
+                            movie.revenuePerSec = campaign.originalRevenue;
+                        }
+                    }
+                }
+            }
+        } else {
+            player.fame += Math.floor(campaign.residualFame);
+            player.fans += Math.floor(campaign.residualFans);
+            activeCampaigns.push(campaign);
+        }
+    });
+    player.activeCampaigns = activeCampaigns;
+
+    // Update promotion dropdown if the campaign panel is open
+    if (document.getElementById("promotionCampaign").style.display === "block") {
+        updatePromotionTargetDropdown();
+    }
+
+    checkAwards();
+    checkSubscriberMilestones();
+    document.getElementById("year").innerText = player.year;
+    document.getElementById("week").innerText = player.week;
+    document.getElementById("fans").innerText = formatNumber("fans", player.fans);
+    document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+    document.getElementById("money").innerText = formatNumber("money", player.money);
+    alert("Advanced to " + player.week + ", " + player.year + "!");
+}
+    
+    function getGenreThumbnail(genre) {
+      const thumbnails = {
+        action: "💥",
+        romance: "💕",
+        comedy: "😂",
+        drama: "🎭",
+        horror: "👻",
+        thriller: "🔪",
+        animation: "🎨",
+        documentary: "📽️",
+        "sci-fi": "🚀",
+        fantasy: "🧙‍♂️",
+        adventure: "🌴",
+        musical: "🎶",
+        western: "🤠",
+        historical: "⏳"
+      };
+      return thumbnails[genre] || "🎬";
+    }
+    function getPosterForVideo(video) {
+  const genrePosters = {
+    action: "https://example.com/posters/action.jpg",
+    romance: "https://example.com/posters/romance.jpg",
+    comedy: "https://example.com/posters/comedy.jpg",
+    drama: "https://example.com/posters/drama.jpg",
+    horror: "https://example.com/posters/horror.jpg",
+    thriller: "https://example.com/posters/thriller.jpg",
+    animation: "https://example.com/posters/animation.jpg",
+    documentary: "https://example.com/posters/documentary.jpg",
+    "sci-fi": "https://example.com/posters/scifi.jpg",
+    fantasy: "https://example.com/posters/fantasy.jpg",
+    adventure: "https://example.com/posters/adventure.jpg",
+    musical: "https://example.com/posters/musical.jpg",
+    western: "https://example.com/posters/western.jpg",
+    historical: "https://example.com/posters/historical.jpg"
+  };
+
+  const actorImages = {
+    "Tom Hanks": "https://example.com/actors/tom_hanks.jpg",
+    "Emma Stone": "https://example.com/actors/emma_stone.jpg",
+    "Robert De Niro": "https://example.com/actors/robert_de_niro.jpg",
+    "Scarlett Johansson": "https://example.com/actors/scarlett_johansson.jpg",
+    "Brad Pitt": "https://example.com/actors/brad_pitt.jpg",
+    "Natalie Portman": "https://example.com/actors/natalie_portman.jpg",
+    "Leonardo DiCaprio": "https://example.com/actors/leonardo_dicaprio.jpg",
+    "Meryl Streep": "https://example.com/actors/meryl_streep.jpg",
+    "Ryan Gosling": "https://example.com/actors/ryan_gosling.jpg",
+    "Anne Hathaway": "https://example.com/actors/anne_hathaway.jpg",
+    "Denzel Washington": "https://example.com/actors/denzel_washington.jpg",
+    "Jennifer Lawrence": "https://example.com/actors/jennifer_lawrence.jpg",
+    "Zendaya": "https://example.com/actors/zendaya.jpg",
+    "Timoth�e Chalamet": "https://example.com/actors/timothee_chalamet.jpg",
+    "Viola Davis": "https://example.com/actors/viola_davis.jpg",
+    "Chris Hemsworth": "https://example.com/actors/chris_hemsworth.jpg",
+    "Maya Torres": "https://example.com/actors/maya_torres.jpg",
+    "Liam Chen": "https://example.com/actors/liam_chen.jpg",
+    "Aisha Khan": "https://example.com/actors/aisha_khan.jpg",
+    "Elliot Brooks": "https://example.com/actors/elliot_brooks.jpg",
+    "Sophia Blake": "https://example.com/actors/sophia_blake.jpg",
+    "Ethan Caldwell": "https://example.com/actors/ethan_caldwell.jpg",
+    "Aria Nguyen": "https://example.com/actors/aria_nguyen.jpg",
+    "Julian Rex": "https://example.com/actors/julian_rex.jpg"
+  };
+
+  const genres = video.genre.split(", ");
+  const movie = player.movies.find(m => m.title === video.title) || 
+                player.streamingMovies.find(m => m.title === video.title) || 
+                player.youtubeVideos.find(v => v.title === video.title);
+
+  if (genres.length > 1 && movie && movie.talents) {
+    const actors = movie.talents.filter(t => actorImages[t.name]);
+    if (actors.length > 0) {
+      const randomActor = actors[Math.floor(Math.random() * actors.length)];
+      return actorImages[randomActor.name] || "https://example.com/posters/default.jpg";
+    }
+  }
+
+  return genrePosters[genres[0].toLowerCase()] || "https://example.com/posters/default.jpg";
+}
+
+function generateReviews(movie, platform, isYouTube = false) {
+  const reviewScore = calculateReviewScore(movie);
+  const comments = generateComments(movie, reviewScore, isYouTube);
+  const review = {
+    title: movie.title,
+    platform: isYouTube ? "YouTube" : platform,
+    score: reviewScore,
+    comments: comments,
+    isSeries: movie.type === "season" || movie.type === "mini-series",
+    currentEpisode: movie.currentEpisode || 1
+  };
+  player.reviews.push(review);
+}
+
+function calculateReviewScore(movie) {
+  let score = 50; // Base score
+  score += movie.budget / 1000; // Budget impact
+  score += movie.talents.filter(t => t.price >= 20000).length * 10; // High-profile talent
+  score += movie.genres.length * 5; // Genre variety
+  if (movie.style === "traditional") score += 10;
+  if (movie.style === "future") score += 15;
+  if (movie.type === "season" || movie.type === "mini-series") score += movie.episodeCount * 2;
+  score = Math.min(95, score + Math.random() * 10 - 5); // Random variation
+  return Math.round(score);
+}
+
+function generateComments(movie, score, isYouTube) {
+  const comments = [];
+  const commentTemplates = {
+    positive: [
+      "Absolutely loved {title}! The {genre} vibes were spot on. Can't wait for {next}!",
+      "{title} is a masterpiece! {actor} was phenomenal. More please!",
+      "This {type} blew me away! {style} storytelling at its finest.",
+      "Incredible work on {title}! The {genre} elements were so engaging."
+    ],
+    negative: [
+      "{title} fell flat. The {genre} felt forced and lacked depth.",
+      "Disappointed with {title}. Expected more from {actor}.",
+      "This {type} didn't hit the mark. {style} approach felt off.",
+      "{title} was a letdown. The pacing in {genre} was all wrong."
+    ],
+    sequelRequests: [
+      "Please make {title} Part {nextPart}!",
+      "We need a Season {nextSeason} of {title} ASAP!",
+      "{title} deserves a sequel! Let's see more {genre} action."
+    ]
+  };
+  const isSeries = movie.type === "season" || movie.type === "mini-series";
+  const nextPart = [...player.movies, ...player.streamingMovies, ...player.youtubeVideos]
+    .filter(m => m.title.includes(movie.title.split(" Part")[0]) && !m.isSeries).length + 2;
+  const nextSeason = [...player.movies, ...player.streamingMovies, ...player.youtubeVideos]
+    .filter(m => m.title.includes(movie.title.split(": Season")[0]) && m.isSeries).length + 2;
+  const mainActor = movie.talents.find(t => t.name.includes("Adekola") || t.name.includes("Adebayo") || t.name.includes("Hanks"))?.name || movie.talents[0]?.name || "the cast";
+  const replacements = {
+    title: movie.title,
+    genre: movie.genres[0],
+    actor: mainActor,
+    type: movie.type,
+    style: movie.style || "modern",
+    next: isSeries ? `Season ${nextSeason}` : `Part ${nextPart}`,
+    nextPart: nextPart,
+    nextSeason: nextSeason
+  };
+
+  const commentCount = isYouTube ? Math.floor(Math.random() * 5 + 5) : Math.floor(Math.random() * 3 + 3);
+  for (let i = 0; i < commentCount; i++) {
+    let comment;
+    if (score >= 80 && Math.random() < 0.7) {
+      comment = commentTemplates.positive[Math.floor(Math.random() * commentTemplates.positive.length)];
+    } else if (score < 60 && Math.random() < 0.5) {
+      comment = commentTemplates.negative[Math.floor(Math.random() * commentTemplates.negative.length)];
+    } else if (score >= 75 && Math.random() < 0.3) {
+      comment = commentTemplates.sequelRequests[Math.floor(Math.random() * commentTemplates.sequelRequests.length)];
+    } else {
+      comment = commentTemplates.positive[Math.floor(Math.random() * commentTemplates.positive.length)];
+    }
+    comment = comment.replace(/{([^}]+)}/g, (match, key) => replacements[key] || match);
+    comments.push(comment);
+  }
+  return comments;
+}
+
+function showReviews() {
+  const existingPanel = document.getElementById("movieReviews");
+  if (existingPanel) existingPanel.remove();
+
+  let reviewPanel = document.createElement("div");
+  reviewPanel.id = "movieReviews";
+  let reviewList = document.createElement("div");
+  reviewList.id = "reviewList";
+
+  player.reviews.forEach(review => {
+    let div = document.createElement("div");
+    div.className = "movie-review";
+    div.innerHTML = `
+      <h3 style="margin: 0 0 8px; color: #FFD700; font-size: 16px;">🎬 ${review.title}</h3>
+      <p><strong>Platform:</strong> ${review.platform}</p>
+      <p><strong>Review Score:</strong> ${review.score}/100</p>
+      ${review.isSeries ? `<p><strong>Episode:</strong> ${review.currentEpisode}</p>` : ""}
+      <h4>Comments:</h4>
+      <ul>
+        ${review.comments.map(comment => `<li>${comment}</li>`).join("")}
+      </ul>
+    `;
+    reviewList.appendChild(div);
+  });
+
+  let closeButton = document.createElement("button");
+  closeButton.innerText = "Close";
+  closeButton.onclick = closeReviews;
+  closeButton.style = "margin-top: 10px; padding: 10px; width: 100%; border-radius: 8px; border: none; background: #ff9800; color: white; font-weight: bold; cursor: pointer;";
+
+  reviewPanel.appendChild(document.createElement("h2")).innerText = "🎬 Movie Reviews";
+  reviewPanel.appendChild(reviewList);
+  reviewPanel.appendChild(closeButton);
+  document.body.appendChild(reviewPanel);
+}
+
+function closeReviews() {
+  const reviewPanel = document.getElementById("movieReviews");
+  if (reviewPanel) reviewPanel.remove();
+}
+
+function checkAwards() {
+  const awards = [
+    { name: "AMVCA (Best Picture)", fameRequired: 5000, reviewScore: 85, viewsRequired: 500000, fameReward: 500, moneyReward: 10000 },
+    { name: "AMVCA (Best Director)", fameRequired: 4000, reviewScore: 80, viewsRequired: 400000, fameReward: 300, moneyReward: 8000 },
+    { name: "Nollywood Awards (Best Film)", fameRequired: 3000, reviewScore: 80, viewsRequired: 300000, fameReward: 200, moneyReward: 5000 },
+    { name: "Oscars (Best Picture)", fameRequired: 10000, reviewScore: 90, viewsRequired: 1000000, fameReward: 1000, moneyReward: 20000 },
+    { name: "BAFTA (Best Film)", fameRequired: 8000, reviewScore: 88, viewsRequired: 800000, fameReward: 800, moneyReward: 15000 },
+    { name: "Cannes Palme d'Or", fameRequired: 12000, reviewScore: 92, viewsRequired: 1200000, fameReward: 1200, moneyReward: 25000 },
+  ];
+
+  player.reviews.forEach(review => {
+    const movie = [...player.streamingMovies, ...player.youtubeVideos].find(m => m.title === review.title);
+    if (!movie || player.awards.some(a => a.title === review.title)) return;
+
+    const views = movie.views || (movie.weeklyFans * movie.weeksSinceRelease * 100);
+    awards.forEach(award => {
+      if (player.fame >= award.fameRequired && review.score >= award.reviewScore && views >= award.viewsRequired) {
+        if (!player.awards.some(a => a.name === award.name && a.title === review.title)) {
+          player.awards.push({ name: award.name, title: review.title });
+          player.fame += award.fameReward;
+          player.money += award.moneyReward;
+          alert(`🏆 Congratulations! "${review.title}" won ${award.name}! Gained ${formatNumber("fame", award.fameReward)} fame and $${formatNumber("money", award.moneyReward)}.`);
+        }
+      }
+    });
+  });
+
+  document.getElementById("awards").innerText = player.awards.length;
+  document.getElementById("money").innerText = formatNumber("money", player.money);
+  document.getElementById("fame").innerText = formatNumber("fame", player.fame);
+}
+  </script>
+</body>
+</html>
